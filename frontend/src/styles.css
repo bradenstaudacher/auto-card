@@ -1,0 +1,309 @@
+:root {
+  --panel: #171a24;
+  --panel-2: #1e2230;
+  --border: #2b3040;
+  --accent: #6cf;
+  --text: #e6e8ef;
+  --muted: #9aa1b4;
+}
+
+.app-loading { display: grid; place-items: center; height: 100%; color: var(--muted); }
+
+/* --- Generic screens --- */
+.screen { min-height: 100%; display: flex; flex-direction: column; }
+.center-screen { align-items: center; justify-content: center; }
+
+.title-card, .reward-panel {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+  padding: 40px; max-width: 720px; width: 92%; text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.game-title { font-size: 48px; letter-spacing: 8px; margin: 0 0 8px; }
+.tagline { color: var(--muted); margin: 0 0 24px; }
+.handle-input {
+  display: block; width: 100%; max-width: 340px; margin: 0 auto 16px; padding: 12px 14px;
+  background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); font-size: 15px;
+}
+.error-text { color: #ff8080; margin-top: 12px; }
+.empty-hint { color: var(--muted); font-style: italic; }
+
+/* --- Buttons --- */
+.btn { border: 1px solid var(--border); background: var(--panel-2); color: var(--text);
+  padding: 9px 16px; border-radius: 10px; cursor: pointer; font-size: 14px; transition: .12s; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn-primary { background: linear-gradient(135deg,#3b6ee0,#5a3be0); border: none; font-weight: 600; }
+.btn-lg { padding: 14px 26px; font-size: 16px; }
+.btn-ghost.active { border-color: var(--accent); color: var(--accent); }
+.btn-danger { background: #7a2230; border: none; }
+
+/* --- Game layout --- */
+.game-screen { padding: 14px 18px 0; gap: 12px; }
+.topbar { display: flex; align-items: center; gap: 14px; }
+.round-pill { background: var(--panel-2); border: 1px solid var(--border); border-radius: 20px;
+  padding: 6px 14px; font-weight: 600; }
+.deploy-count { color: var(--muted); }
+.topbar .btn { margin-left: auto; }
+
+.game-layout { display: grid; grid-template-columns: 220px 1fr; gap: 14px; flex: 1; min-height: 0; }
+
+/* --- Bench --- */
+.bench, .battle-log { background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px; overflow-y: auto; }
+.panel-title { margin: 0 0 10px; font-size: 13px; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--muted); }
+.bench-list { display: flex; flex-direction: column; gap: 10px; }
+.bench-item { display: flex; align-items: center; gap: 10px; }
+.bench-label { display: flex; flex-direction: column; }
+.bench-name { font-size: 14px; }
+.bench-sub { font-size: 11px; color: var(--muted); }
+
+/* --- Champion circles --- */
+.champ-circle { border-radius: 50%; display: grid; place-items: center;
+  border: 2px solid rgba(0,0,0,.35); cursor: pointer; user-select: none; }
+.champ-circle[draggable="true"] { cursor: grab; }
+.champ-circle.dimmed { opacity: .35; cursor: default; }
+.champ-glyph { font-size: 20px; line-height: 1; }
+.count-pill { background: var(--accent); color: #06121f; border-radius: 10px;
+  padding: 1px 8px; font-size: 12px; margin-left: 6px; }
+
+/* --- Stage + grid --- */
+.stage { display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 0; }
+.grid-wrap { width: 100%; max-width: 760px; }
+.grid-legend { display: flex; justify-content: space-between; font-size: 12px;
+  color: var(--muted); margin-bottom: 6px; }
+.battle-grid { display: grid; gap: 3px; aspect-ratio: 8 / 6; width: 100%;
+  grid-template-rows: repeat(6, 1fr); grid-auto-rows: 1fr;
+  background: var(--border); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
+.grid-cell { background: var(--panel-2); border-radius: 4px; position: relative;
+  display: grid; place-items: center; min-width: 0; min-height: 0; }
+.grid-cell.ally-zone { background: #16233a; }
+.grid-cell.enemy-zone { background: #2a1a20; }
+.cell-token { position: relative; display: grid; place-items: center; }
+.enemy-token { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  border: 2px solid rgba(255,120,90,.6); }
+.unplace-btn { position: absolute; top: -6px; right: -6px; width: 18px; height: 18px;
+  border-radius: 50%; border: none; background: #7a2230; color: #fff; cursor: pointer;
+  font-size: 12px; line-height: 1; display: grid; place-items: center; }
+.lockin { align-self: center; }
+
+/* --- Modal --- */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  display: grid; place-items: center; z-index: 50; }
+.modal { background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+  width: 92%; max-width: 460px; overflow: hidden; }
+.modal-head { display: flex; align-items: center; gap: 12px; padding: 16px;
+  border-bottom: 3px solid; }
+.modal-badge { width: 40px; height: 40px; border-radius: 50%; }
+.modal-name { margin: 0; font-size: 20px; }
+.modal-sub { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.modal-close { margin-left: auto; background: none; border: none; color: var(--muted);
+  font-size: 26px; cursor: pointer; }
+.modal-body { padding: 16px; }
+.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 20px; margin-bottom: 16px; }
+.stat-cell { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border);
+  padding: 4px 0; font-size: 14px; }
+.stat-label { color: var(--muted); }
+.slots { display: flex; flex-direction: column; gap: 10px; }
+.slot-row { display: flex; gap: 10px; align-items: center; }
+.slot-label { width: 84px; color: var(--muted); font-size: 12px; text-transform: uppercase; }
+.slot-boxes { display: flex; gap: 6px; flex-wrap: wrap; }
+.slot-box { border: 1px dashed var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; }
+.slot-box.empty { color: var(--muted); }
+.slot-box.filled { border-style: solid; border-color: var(--accent); }
+.modal-foot { padding: 12px 16px; border-top: 1px solid var(--border); text-align: right; }
+
+/* --- Tableau + cards --- */
+.tableau { background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px; margin-top: 12px; max-height: 190px; overflow-y: auto; }
+.tableau-list, .reward-choices { display: flex; gap: 10px; flex-wrap: wrap; }
+.card { display: flex; background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden; width: 200px; text-align: left; }
+.reward-card { cursor: pointer; transition: .12s; color: var(--text); }
+.reward-card:hover:not(:disabled) { transform: translateY(-3px); border-color: var(--accent); }
+.card-stripe { width: 6px; flex-shrink: 0; }
+.card-body { padding: 8px 10px; }
+.card-name { font-weight: 600; font-size: 14px; }
+.card-meta { color: var(--muted); font-size: 11px; text-transform: capitalize; margin: 2px 0 4px; }
+.card-desc { font-size: 12px; color: #c4c9d6; }
+.rar-uncommon { border-color: #4a9e6b; }
+.rar-rare { border-color: #c9a24b; box-shadow: 0 0 12px rgba(201,162,75,.2); }
+
+/* --- Reward screen --- */
+.result-banner { font-size: 40px; letter-spacing: 6px; margin: 0 0 4px; }
+.result-banner.win { color: #6ce39a; }
+.result-banner.loss { color: #ff8080; }
+.reward-choices { justify-content: center; margin: 20px 0; }
+
+/* --- Replay --- */
+.replay-screen { padding: 14px 18px; gap: 10px; }
+/* flex:none so the stage is only as tall as the grid — controls sit right under
+   it instead of being pushed to the bottom of the viewport. */
+.replay-stage { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px;
+  flex: none; align-items: start; justify-content: center; }
+.replay-stage .grid-wrap { max-width: 560px; }
+.replay-grid .replay-unit { position: relative; display: grid; place-items: center; z-index: 2; }
+.unit-token { width: 78%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
+  transition: all .25s ease; }
+.replay-unit.dead .unit-token { opacity: .2; filter: grayscale(1); }
+.replay-unit.casting .unit-token { box-shadow: 0 0 0 4px rgba(120,180,255,.7), 0 0 18px rgba(120,180,255,.9); }
+.hp-bar { position: absolute; bottom: -2px; width: 80%; height: 5px; background: #000;
+  border-radius: 3px; overflow: hidden; }
+.hp-fill { height: 100%; background: linear-gradient(90deg,#e34b4b,#e39a4b); transition: width .25s; }
+.floater { position: absolute; top: -4px; font-weight: 700; font-size: 15px;
+  animation: floatUp .8s ease-out forwards; pointer-events: none; text-shadow: 0 1px 2px #000; }
+.floater.dmg { color: #ff6b6b; }
+.floater.heal { color: #6ce39a; }
+@keyframes floatUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-26px); opacity: 0; } }
+/* Fixed height, matches the grid, scrolls internally as events accumulate. */
+.battle-log { font-size: 13px; height: 420px; max-height: 60vh; overflow-y: auto; }
+.battle-log .panel-title { position: sticky; top: 0; background: var(--panel);
+  margin: -12px -12px 8px; padding: 12px 12px 8px; }
+.log-line { padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,.04); color: #c4c9d6; }
+.replay-controls { display: flex; align-items: center; gap: 10px; justify-content: center; margin-top: 4px; }
+.speed-group { display: flex; gap: 4px; }
+.replay-result { font-weight: 700; font-size: 18px; margin: 0 8px; }
+.replay-result.win { color: #6ce39a; }
+.replay-result.loss { color: #ff8080; }
+
+/* --- M4: equipment + ability assignment --- */
+.tableau-hint, .drop-hint { color: var(--muted); font-size: 11px; font-weight: 400; }
+.tableau-hint { margin-left: 10px; text-transform: none; letter-spacing: 0; }
+.drop-hint { display: block; text-align: center; margin: 4px 0 12px; font-style: italic; }
+.card[draggable="true"] { cursor: grab; }
+.card.equipped { opacity: .5; }
+.card.roster-wide { border-style: dashed; }
+.card-tag { margin-top: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: .5px;
+  color: var(--accent); }
+.stat-value.boosted { color: #6ce39a; font-weight: 700; }
+.slot-box.filled { display: inline-flex; align-items: center; gap: 6px; }
+.slot-remove { background: none; border: none; color: #ff8080; cursor: pointer;
+  font-size: 14px; line-height: 1; padding: 0; }
+.ability-order { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.ability-chip { display: flex; align-items: center; gap: 8px; background: var(--panel-2);
+  border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 13px;
+  cursor: grab; }
+.ability-chip.dragging { opacity: .4; border-color: var(--accent); }
+.ability-num { background: var(--accent); color: #06121f; border-radius: 6px;
+  width: 18px; height: 18px; display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+
+/* --- M4b: ability detail chips --- */
+.abilities-row { align-items: flex-start; }
+.ability-chip { flex-direction: column; align-items: stretch; gap: 4px; }
+.ability-chip.unimpl { opacity: .6; }
+.ability-head { display: flex; align-items: center; gap: 8px; }
+.ability-name { font-weight: 600; }
+.ability-cost { color: #7fb2e6; font-size: 11px; }
+.ability-badge { font-size: 9px; text-transform: uppercase; letter-spacing: .5px;
+  background: var(--border); color: var(--muted); border-radius: 6px; padding: 1px 6px; margin-left: auto; }
+.ability-badge.soon { color: #e3b34b; }
+.ability-desc { font-size: 12px; color: #c4c9d6; line-height: 1.35; }
+
+/* --- Card combining indicators --- */
+.card-tier { display: inline-grid; place-items: center; margin-left: 6px; min-width: 18px;
+  height: 18px; padding: 0 4px; border-radius: 6px; font-size: 10px; font-weight: 700;
+  background: linear-gradient(135deg,#c9a24b,#e3c877); color: #2a2210; vertical-align: middle; }
+.combine-progress { margin-top: 4px; font-size: 10px; font-weight: 600; color: #e3b34b;
+  text-transform: uppercase; letter-spacing: .5px; }
+
+/* --- Feature batch: discard, bench equips, combine toast --- */
+.card { position: relative; }
+.card-discard { position: absolute; top: 4px; right: 4px; width: 18px; height: 18px;
+  border-radius: 50%; border: none; background: rgba(122,34,48,.85); color: #fff;
+  font-size: 12px; line-height: 1; cursor: pointer; display: none; place-items: center; z-index: 2; }
+.card:hover .card-discard { display: grid; }
+
+.deployed-tag { margin-left: 6px; font-size: 9px; text-transform: uppercase; letter-spacing: .5px;
+  color: #6ce39a; border: 1px solid rgba(108,227,154,.4); border-radius: 5px; padding: 0 4px; }
+.bench-equips { list-style: none; margin: 4px 0 0; padding: 0; display: flex;
+  flex-direction: column; gap: 2px; }
+.bench-equips li { font-size: 11px; color: #b9c0d4; padding-left: 8px; position: relative; }
+.bench-equips li::before { content: '▸'; position: absolute; left: 0; color: var(--muted); }
+
+.combine-toast { position: fixed; top: 22px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg,#c9a24b,#e3c877); color: #241d08; font-weight: 600;
+  padding: 12px 22px; border-radius: 12px; box-shadow: 0 10px 34px rgba(201,162,75,.5);
+  z-index: 100; animation: combinePop .4s cubic-bezier(.2,1.4,.4,1); }
+.combine-toast strong { text-decoration: none; }
+.combine-spark { margin-right: 8px; display: inline-block; animation: spin 1.2s linear infinite; }
+@keyframes combinePop { from { transform: translateX(-50%) scale(.6); opacity: 0; }
+  to { transform: translateX(-50%) scale(1); opacity: 1; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   Aesthetic layer — cohesive polish (overrides above)
+   ============================================================ */
+body {
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #1b2740 0%, rgba(27,39,64,0) 60%),
+    radial-gradient(900px 500px at 50% 110%, #241a2e 0%, rgba(36,26,46,0) 55%),
+    #0c0e15;
+}
+
+/* Panels get a subtle top-lit gradient + soft ring */
+.bench, .battle-log, .tableau, .title-card, .reward-panel, .modal {
+  background: linear-gradient(180deg, #1b1f2c 0%, #14171f 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 8px 24px rgba(0,0,0,.35);
+}
+.round-pill {
+  background: linear-gradient(180deg, #232838, #1a1e2a);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* Title: luminous gradient text */
+.game-title {
+  background: linear-gradient(180deg, #fff 0%, #9db4e6 60%, #6c8fd6 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 3px 10px rgba(90,120,230,.35));
+}
+
+/* Tokens gain depth: inner highlight + grounded shadow */
+.champ-circle, .enemy-token, .unit-token {
+  box-shadow: inset 0 2px 3px rgba(255,255,255,.28), inset 0 -3px 5px rgba(0,0,0,.35),
+    0 3px 6px rgba(0,0,0,.4);
+  border-width: 2px;
+}
+.champ-circle:hover { transform: translateY(-1px); transition: transform .1s; }
+
+/* Battle grid: vignette + directional zone tints (enemy warm top, ally cool bottom) */
+.battle-grid {
+  background: radial-gradient(120% 120% at 50% 50%, #20242f 0%, #14161d 100%);
+  box-shadow: inset 0 0 40px rgba(0,0,0,.5);
+}
+.grid-cell { box-shadow: inset 0 0 0 1px rgba(255,255,255,.02); }
+.grid-cell.ally-zone { background: linear-gradient(180deg, #16233a 0%, #1a2c48 100%); }
+.grid-cell.enemy-zone { background: linear-gradient(180deg, #3a1a20 0%, #2a1519 100%); }
+
+/* Cards: crisper edges, smoother hover */
+.card { background: linear-gradient(180deg, #222736 0%, #1a1e29 100%); transition: transform .12s, box-shadow .12s, border-color .12s; }
+.reward-card:hover:not(:disabled) { box-shadow: 0 10px 28px rgba(0,0,0,.45), 0 0 0 1px var(--accent); }
+
+/* Primary button glow */
+.btn-primary { box-shadow: 0 6px 18px rgba(70,90,220,.35); }
+.btn-primary:hover:not(:disabled) { box-shadow: 0 8px 24px rgba(90,110,240,.5); }
+
+/* Replay result banner pop */
+.replay-result.win { text-shadow: 0 0 14px rgba(108,227,154,.6); }
+
+/* --- Status effect floaters --- */
+.floater.bleed { color: #ff5d6c; }
+.floater.poison { color: #7ed957; }
+.floater.burn { color: #ffab4c; }
+.floater.cleanse { color: #6cf0d0; font-size: 12px; }
+
+/* --- Co-op UI --- */
+.start-buttons { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.code-input { text-align: center; letter-spacing: 8px; font-size: 22px; text-transform: uppercase; }
+.room-code-display { font-size: 52px; letter-spacing: 12px; font-weight: 800; margin: 18px 0;
+  color: #f4e88a; text-shadow: 0 0 20px rgba(244,232,138,.35); }
+.lobby-status, .waiting-banner { color: var(--muted); display: flex; align-items: center;
+  justify-content: center; gap: 8px; margin: 12px 0; }
+.pulse-dot { width: 10px; height: 10px; border-radius: 50%; background: #6ce39a;
+  animation: pulse 1.1s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: .3; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.2); } }
+.coop-tag { background: linear-gradient(135deg,#3b6ee0,#5a3be0); border-radius: 20px;
+  padding: 4px 12px; font-size: 12px; font-weight: 600; }
+.ally-lock-badge { position: absolute; bottom: -4px; right: -4px; font-size: 12px; }
+.waiting-banner { font-size: 16px; }

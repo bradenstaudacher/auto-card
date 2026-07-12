@@ -1,0 +1,118 @@
+# Monster templates for PvE encounters. Types span the circle so players must
+# weigh their fielded champions against enemy weaknesses (per locked design).
+# tier: weak | tough | elite | boss — used by the encounter builder to scale.
+monsters:
+  - key: lesser_imp
+    name: Lesser Imp
+    type: Occult
+    color: purple
+    role: weak melee
+    tier: weak
+    base_stats:
+      health: 45
+      attack_damage: 7
+      magic_power: 2
+      armor: 1
+      shield: 2
+      mana_cap: 4
+      mana_regen: 0.5
+      movement_speed: 3
+      attack_range: 1
+      attack_speed: 1.0
+
+  - key: ash_hound
+    name: Ash Hound
+    type: Fury
+    color: crimson
+    role: fast melee
+    tier: weak
+    combat_effects:
+      burn: { chance: 0.35, damage: 3, duration: 2 }
+    base_stats:
+      health: 55
+      attack_damage: 9
+      magic_power: 0
+      armor: 2
+      shield: 1
+      mana_cap: 4
+      mana_regen: 0.5
+      movement_speed: 4
+      attack_range: 1
+      attack_speed: 1.2
+
+  - key: bone_wretch
+    name: Bone Wretch
+    type: Death
+    color: black
+    role: fragile attacker
+    tier: weak
+    default_abilities: [Vampiric Drain]
+    base_stats:
+      health: 40
+      attack_damage: 11
+      magic_power: 3
+      armor: 0
+      shield: 1
+      mana_cap: 4
+      mana_regen: 0.5
+      movement_speed: 3
+      attack_range: 1
+      attack_speed: 1.0
+
+  - key: oathbound_guard
+    name: Oathbound Guard
+    type: Law
+    color: lightblue
+    role: armored melee
+    tier: tough
+    base_stats:
+      health: 110
+      attack_damage: 8
+      magic_power: 2
+      armor: 8
+      shield: 4
+      mana_cap: 5
+      mana_regen: 0.5
+      movement_speed: 2
+      attack_range: 1
+      attack_speed: 0.8
+
+  - key: pale_acolyte
+    name: Pale Acolyte
+    type: Holy
+    color: lightyellow
+    role: simple caster
+    tier: tough
+    default_abilities: [Vampiric Drain]
+    base_stats:
+      health: 60
+      attack_damage: 5
+      magic_power: 12
+      armor: 2
+      shield: 5
+      mana_cap: 8
+      mana_regen: 1.25
+      movement_speed: 2
+      attack_range: 3
+      attack_speed: 0.8
+
+  - key: rift_brute
+    name: Rift Brute
+    type: Occult
+    color: purple
+    role: elite
+    tier: elite
+    default_abilities: [Cleave]
+    ability_params:
+      Cleave: { damage_scale: 1.8 }
+    base_stats:
+      health: 180
+      attack_damage: 16
+      magic_power: 6
+      armor: 6
+      shield: 6
+      mana_cap: 6
+      mana_regen: 1
+      movement_speed: 2
+      attack_range: 1
+      attack_speed: 0.9

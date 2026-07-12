@@ -1,0 +1,35 @@
+# Rails
+/.bundle
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+/public/assets
+.byebug_history
+
+# Secrets — never commit
+/config/master.key
+/config/credentials/*.key
+.env
+.env.*
+
+# Test / coverage
+/coverage/
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Node / frontend
+/frontend/node_modules
+/frontend/dist
+/frontend/.vite
+npm-debug.log*
+
+# Local scratch
+/tmp/

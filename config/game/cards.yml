@@ -1,0 +1,223 @@
+# Starter card templates for the reward system. Balance is PROVISIONAL — names
+# and numbers to be confirmed in the Content pass. `rules` carries the machine
+# data: stat_modifiers (added to a character's stats), combat_effects, and
+# ability_name (links an ability card to a Combat::Abilities definition).
+cards:
+  # --- Ability cards (link to implemented engine abilities) ---
+  - key: card_vampiric_drain
+    name: Vampiric Drain
+    category: ability
+    type_affinity: Death
+    rarity: common
+    slot_type: ability
+    description: Drain 25% of an enemy's current health (5-40), healing yourself for it.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Vampiric Drain
+
+  - key: card_cleave
+    name: Cleave
+    category: ability
+    type_affinity: Fury
+    rarity: common
+    slot_type: ability
+    tier: 1
+    upgrades_to: card_cleave_2
+    description: Strike the target and adjacent enemies for 150% attack damage.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Cleave
+      ability_params: { damage_scale: 1.5 }
+
+  - key: card_cleave_2
+    name: Cleave II
+    category: ability
+    type_affinity: Fury
+    rarity: uncommon
+    slot_type: ability
+    tier: 2
+    upgrades_to: card_cleave_3
+    description: Strike the target and adjacent enemies for 170% attack damage.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Cleave
+      ability_params: { damage_scale: 1.7 }
+
+  - key: card_cleave_3
+    name: Cleave III
+    category: ability
+    type_affinity: Fury
+    rarity: rare
+    slot_type: ability
+    tier: 3
+    description: Strike the target and adjacent enemies for 200% attack damage.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Cleave
+      ability_params: { damage_scale: 2.0 }
+
+  - key: card_hex_bolt
+    name: Hex Bolt
+    category: ability
+    type_affinity: Occult
+    rarity: common
+    slot_type: ability
+    tier: 1
+    upgrades_to: card_hex_bolt_2
+    description: Blast the nearest enemy for 160% magic power (ranged).
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Hex Bolt
+      ability_params: { power_scale: 1.6 }
+
+  - key: card_hex_bolt_2
+    name: Hex Bolt II
+    category: ability
+    type_affinity: Occult
+    rarity: uncommon
+    slot_type: ability
+    tier: 2
+    description: Blast the nearest enemy for 200% magic power (ranged).
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Hex Bolt
+      ability_params: { power_scale: 2.0 }
+
+  - key: card_holy_flare
+    name: Holy Flare
+    category: ability
+    type_affinity: Holy
+    rarity: common
+    slot_type: ability
+    tier: 1
+    description: Sear an enemy for 150% magic power — devastating against Occult.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Holy Flare
+      ability_params: { power_scale: 1.5 }
+
+  - key: card_shield_pulse
+    name: Shield Pulse
+    category: ability
+    type_affinity: Law
+    rarity: common
+    slot_type: ability
+    tier: 1
+    description: Heal the most-wounded nearby ally for 150% magic power.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Shield Pulse
+      ability_params: { power_scale: 1.5 }
+
+  # --- Weapons ---
+  - key: card_serrated_blade
+    name: Serrated Blade
+    category: weapon
+    type_affinity: null
+    rarity: common
+    slot_type: weapon
+    tier: 1
+    upgrades_to: card_serrated_blade_2
+    description: "+4 attack damage."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { attack_damage: 4 }
+      combat_effects: { bleed: { chance: 0.25, damage: 4, duration: 3 } }
+
+  - key: card_serrated_blade_2
+    name: Serrated Blade II
+    category: weapon
+    type_affinity: null
+    rarity: uncommon
+    slot_type: weapon
+    tier: 2
+    description: "+8 attack damage, stronger bleed."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { attack_damage: 8 }
+      combat_effects: { bleed: { chance: 0.4, damage: 6, duration: 3 } }
+
+  - key: card_oaken_staff
+    name: Oaken Staff
+    category: weapon
+    type_affinity: null
+    rarity: common
+    slot_type: weapon
+    description: "+3 magic power, +1 attack range."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { magic_power: 3, attack_range: 1 }
+
+  # --- Equipment ---
+  - key: card_iron_plating
+    name: Iron Plating
+    category: equipment
+    type_affinity: null
+    rarity: common
+    slot_type: equipment
+    description: "+3 armor, +15 health."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { armor: 3, health: 15 }
+
+  - key: card_warding_charm
+    name: Warding Charm
+    category: equipment
+    type_affinity: null
+    rarity: uncommon
+    slot_type: equipment
+    description: "+4 shield."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { shield: 4 }
+
+  # --- Passives ---
+  - key: card_battle_rhythm
+    name: Battle Rhythm
+    category: passive
+    type_affinity: null
+    rarity: common
+    slot_type: passive
+    description: "+1 mana regen."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { mana_regen: 1 }
+
+  - key: card_lawful_formation
+    name: Lawful Formation
+    category: passive
+    type_affinity: Law
+    rarity: uncommon
+    slot_type: passive
+    description: "+2 armor if adjacent to an ally at battle start."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      combat_effects: { adjacent_ally_armor: 2 }
+
+  # --- Modifiers (run/roster level) ---
+  - key: card_crimson_momentum
+    name: Crimson Momentum
+    category: modifier
+    type_affinity: Fury
+    rarity: rare
+    slot_type: roster_modifier
+    description: "Fury units gain +1 mana whenever they defeat an enemy."
+    valid_types: [Fury]
+    valid_subclasses: []
+    rules:
+      combat_effects: { on_kill_mana: 1, applies_to_type: Fury }

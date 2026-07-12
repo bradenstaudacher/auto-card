@@ -1,0 +1,123 @@
+# Base playable champions — one per type. Data-driven: new champions/subclasses
+# drop in here without engine changes. Colors are the locked type palette.
+champions:
+  - key: ember_vanguard
+    name: Ember Vanguard
+    type: Fury
+    color: crimson
+    subclass: Warrior
+    role: Frontline physical attacker
+    default_abilities: [Cleave]
+    slot_config:
+      weapon_slots: 2
+      equipment_slots: 0
+      passive_slots: 1
+      ability_slots: 1
+    base_stats:
+      health: 120
+      attack_damage: 14
+      magic_power: 4
+      armor: 6
+      shield: 2
+      mana_cap: 6
+      mana_regen: 1
+      movement_speed: 3
+      attack_range: 1
+      attack_speed: 1.0
+
+  - key: argent_truvate
+    name: Argent Truvate
+    type: Law
+    color: lightblue
+    subclass: Truvate
+    role: Defensive controller / caster
+    default_abilities: [Shield Pulse]
+    slot_config:
+      weapon_slots: 0
+      equipment_slots: 1
+      passive_slots: 2
+      ability_slots: 2
+    base_stats:
+      health: 90
+      attack_damage: 8
+      magic_power: 10
+      armor: 3
+      shield: 5
+      mana_cap: 8
+      mana_regen: 1.25
+      movement_speed: 2
+      attack_range: 2
+      attack_speed: 0.9
+
+  - key: violet_alchemist
+    name: Violet Alchemist
+    type: Occult
+    color: purple
+    subclass: Alchemist
+    role: Spell-focused backline unit
+    default_abilities: [Hex Bolt]
+    slot_config:
+      weapon_slots: 0
+      equipment_slots: 1
+      passive_slots: 1
+      ability_slots: 3
+    base_stats:
+      health: 80
+      attack_damage: 6
+      magic_power: 14
+      armor: 2
+      shield: 6
+      mana_cap: 10
+      mana_regen: 1.5
+      movement_speed: 2
+      attack_range: 3
+      attack_speed: 0.8
+
+  - key: hollow_reaper
+    name: Hollow Reaper
+    type: Death
+    color: black
+    subclass: Reaper
+    role: Fast assassin / finisher
+    default_abilities: [Vampiric Drain]
+    slot_config:
+      weapon_slots: 1
+      equipment_slots: 0
+      passive_slots: 1
+      ability_slots: 1
+    base_stats:
+      health: 95
+      attack_damage: 12
+      magic_power: 8
+      armor: 3
+      shield: 3
+      mana_cap: 5
+      mana_regen: 1
+      movement_speed: 4
+      attack_range: 1
+      attack_speed: 1.1
+
+  # 5th champion (locked this session): Holy is playable at launch.
+  - key: dawn_cleric
+    name: Dawn Cleric
+    type: Holy
+    color: lightyellow
+    subclass: Cleric
+    role: Support / healer, strong vs Occult
+    default_abilities: [Holy Flare]
+    slot_config:
+      weapon_slots: 0
+      equipment_slots: 1
+      passive_slots: 1
+      ability_slots: 2
+    base_stats:
+      health: 100
+      attack_damage: 7
+      magic_power: 11
+      armor: 4
+      shield: 5
+      mana_cap: 8
+      mana_regen: 1.25
+      movement_speed: 2
+      attack_range: 2
+      attack_speed: 0.9

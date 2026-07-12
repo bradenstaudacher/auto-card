@@ -1,0 +1,44 @@
+# Local development services for auto-card. App (Rails API + React) runs
+# natively; these containers provide the backing services.
+#   - postgres: primary datastore
+#   - redis:    Action Cable pub/sub adapter for co-op multiplayer (M4/M5)
+#
+# Usage:
+#   docker compose up -d      # start services
+#   docker compose ps         # status
+#   docker compose down       # stop (data persists in named volumes)
+#   docker compose down -v    # stop AND wipe data
+services:
+  postgres:
+    image: postgres:16
+    container_name: auto_card_postgres
+    environment:
+      POSTGRES_USER: auto_card
+      POSTGRES_PASSWORD: auto_card_dev
+      POSTGRES_DB: auto_card_development
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auto_card"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: auto_card_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pg_data:
+  redis_data:

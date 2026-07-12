@@ -1,0 +1,106 @@
+# Ability metadata (display + validation). Effect LOGIC lives in
+# app/lib/combat/abilities/*.rb keyed by name. Milestone 1 implements the first
+# two; the rest are declared so content/UI can reference them as they land.
+abilities:
+  - name: Vampiric Drain
+    type: Death
+    category: ability
+    damage_type: magic
+    mana_cost: 3
+    targeting: enemy
+    range: 3
+    implemented: true
+    description: >-
+      Drains an enemy for 25% of its current health, healing the caster for the
+      damage dealt (after shield/type advantage), clamped to 5-40.
+
+  - name: Cleave
+    type: Fury
+    category: ability
+    damage_type: physical
+    mana_cost: 4
+    targeting: enemy
+    range: 1
+    implemented: true
+    description: >-
+      Strikes the target and all enemies adjacent to it for 150% attack damage.
+
+  - name: Bone Spear
+    type: Death
+    category: ability
+    damage_type: magic
+    mana_cost: 4
+    targeting: enemy
+    range: 4
+    implemented: false
+    description: Placeholder — declared for content/UI; logic lands post-M1.
+
+  - name: Shield Pulse
+    type: Law
+    category: ability
+    damage_type: heal
+    mana_cost: 5
+    targeting: ally
+    range: 3
+    implemented: true
+    description: Heal the most-wounded nearby ally for 150% magic power.
+
+  - name: Hex Bolt
+    type: Occult
+    category: ability
+    damage_type: magic
+    mana_cost: 3
+    targeting: enemy
+    range: 4
+    implemented: true
+    description: Blast the nearest enemy for 160% magic power (ranged).
+
+  - name: Holy Flare
+    type: Holy
+    category: ability
+    damage_type: magic
+    mana_cost: 4
+    targeting: enemy
+    range: 3
+    implemented: true
+    description: Sear an enemy for 150% magic power — devastating against Occult.
+
+  - name: Fury Strike
+    type: Fury
+    category: ability
+    damage_type: physical
+    mana_cost: 3
+    targeting: enemy
+    range: 1
+    implemented: false
+    description: Placeholder.
+
+  - name: Law Bind
+    type: Law
+    category: ability
+    damage_type: none
+    mana_cost: 4
+    targeting: enemy
+    range: 3
+    implemented: false
+    description: Placeholder — roots an enemy.
+
+  - name: Alchemical Burst
+    type: Occult
+    category: ability
+    damage_type: magic
+    mana_cost: 5
+    targeting: area
+    range: 3
+    implemented: false
+    description: Placeholder — AoE.
+
+  - name: Reaper Dash
+    type: Death
+    category: ability
+    damage_type: physical
+    mana_cost: 3
+    targeting: enemy
+    range: 3
+    implemented: false
+    description: Placeholder — gap closer.
