@@ -10,6 +10,8 @@ module Combat
     # Adds (or refreshes) a status on the target. Refresh takes the longer
     # remaining duration and the higher per-tick damage so stacks don't stall.
     def apply(unit, kind:, damage:, duration:, source_id:)
+      return nil if unit.immune?(kind)
+
       existing = unit.statuses.find { |s| s["type"] == kind }
       if existing
         existing["remaining"] = [existing["remaining"], duration].max

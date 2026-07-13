@@ -4,7 +4,6 @@ import { subscribeToSession } from './cable'
 import StartScreen from './components/StartScreen'
 import LobbyScreen from './components/LobbyScreen'
 import PreparationScreen from './components/PreparationScreen'
-import BattleReplay from './components/BattleReplay'
 import RewardScreen from './components/RewardScreen'
 import CompletedScreen from './components/CompletedScreen'
 import './styles.css'
@@ -88,7 +87,12 @@ export default function App() {
     const seenTag = round ? `seen-${round.round_number}` : null
 
     if (run.status === 'reward' && round?.status === 'resolved' && watched !== seenTag) {
-      return <BattleReplay run={run} round={round} onComplete={() => setWatched(seenTag)} />
+      return (
+        <PreparationScreen
+          run={run} me={me} onUpdate={update} onAbandon={abandon}
+          replayRound={round} onReplayComplete={() => setWatched(seenTag)}
+        />
+      )
     }
     if (run.status === 'reward') {
       return <RewardScreen run={run} me={me} onUpdate={update} onWatchAgain={() => setWatched(null)} />

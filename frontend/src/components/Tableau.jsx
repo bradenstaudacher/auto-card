@@ -1,19 +1,39 @@
+import { useState } from 'react'
 import { stripeBackground } from '../theme'
-import { startCardDrag } from '../dnd'
+import { startCardDrag, isCardDrag, CARD_DND } from '../dnd'
 
 const RARITY_CLASS = { common: 'rar-common', uncommon: 'rar-uncommon', rare: 'rar-rare' }
 const ROMAN = { 2: 'II', 3: 'III', 4: 'IV', 5: 'V' }
 const COMBINE_AT = 3
 
 // Bottom panel: the player's owned upgrade cards. Drag a card onto a champion
-// (bench or grid) to equip it. Roster-wide modifiers aren't equipped to one
-// champion, so they're shown but not draggable.
-export default function Tableau({ cards, rosterById, onDiscard }) {
+// (bench or grid) to equip it, or drop it onto another card here to reorder the
+// tableau. Roster-wide modifiers aren't equipped to one champion (not draggable
+// to a champion) but can still be reordered.
+export default function Tableau({ cards, rosterById, onDiscard, onReorder }) {
+  const [dragOverId, setDragOverId] = useState(null)
+
   // Count ALL copies per template (equipped or not) for the "2/3 → upgrades" hint.
   const copyCounts = {}
   cards.forEach((c) => {
     copyCounts[c.card_template_id] = (copyCounts[c.card_template_id] || 0) + 1
   })
+
+  // Drop a dragged card onto another card here → move it before the target.
+  function onReorderDrop(e, targetId) {
+    if (!isCardDrag(e) || !onReorder) return
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOverId(null)
+    const draggedId = Number(e.dataTransfer.getData(CARD_DND))
+    if (!draggedId || draggedId === targetId) return
+    const ids = cards.map((c) => c.id)
+    const from = ids.indexOf(draggedId)
+    if (from < 0) return
+    ids.splice(from, 1)
+    ids.splice(ids.indexOf(targetId), 0, draggedId)
+    onReorder(ids)
+  }
 
   return (
     <div className="tableau">
@@ -35,10 +55,13 @@ export default function Tableau({ cards, rosterById, onDiscard }) {
           return (
             <div
               key={c.id}
-              className={`card ${RARITY_CLASS[c.rarity] || ''}${equipped ? ' equipped' : ''}${rosterWide ? ' roster-wide' : ''}`}
+              className={`card ${RARITY_CLASS[c.rarity] || ''}${equipped ? ' equipped' : ''}${rosterWide ? ' roster-wide' : ''}${dragOverId === c.id ? ' drag-over' : ''}`}
               draggable={draggable}
               onDragStart={(e) => draggable && startCardDrag(e, c.id)}
-              title={draggable ? 'Drag onto a champion to equip' : 'Applies to your whole roster'}
+              onDragOver={(e) => { if (isCardDrag(e) && onReorder) { e.preventDefault(); setDragOverId(c.id) } }}
+              onDragLeave={() => setDragOverId((cur) => (cur === c.id ? null : cur))}
+              onDrop={(e) => onReorderDrop(e, c.id)}
+              title={draggable ? 'Drag onto a champion to equip · drop on another card to reorder' : 'Applies to your whole roster'}
             >
               <div className="card-stripe" style={{ background: stripeBackground(c.valid_types) }} />
               {onDiscard && (

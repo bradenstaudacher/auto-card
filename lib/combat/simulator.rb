@@ -26,6 +26,8 @@ module Combat
       grid = Grid.new(**@input[:grid])
       units = @input[:units].map { |u| Unit.new(u) }
       state = BattleState.new(grid: grid, units: units, prng: Prng.new(@input[:seed]))
+      apply_start_effects(state)
+      apply_auras(state)
 
       until state.over? || state.tick >= @max_ticks
         state.tick += 1
@@ -36,6 +38,60 @@ module Combat
     end
 
     private
+
+    # One-time battle-start passives: a unit adjacent to any living ally gains
+    # the configured armor/shield (Lawful Formation, Martyr's Vow). Applied once
+    # before the first tick as a static stat buff — no timeline event, since it
+    # changes no health; its effect shows up in later mitigation and outcomes.
+    START_EFFECT_STATS = { "adjacent_ally_armor" => :armor, "adjacent_ally_shield" => :shield }.freeze
+
+    def apply_start_effects(state)
+      state.units.each do |unit|
+        next if unit.start_effects.empty?
+        next unless state.allies_of(unit).any? { |a| a.alive? && Grid.manhattan(unit.position, a.position) == 1 }
+
+        unit.start_effects.each do |kind, amount|
+          stat = START_EFFECT_STATS[kind]
+          unit.stats[stat] += amount if stat
+        end
+      end
+    end
+
+    # Passive health regen (health_regen is HP/second). Accumulate the per-tick
+    # fraction and apply whole HP so rates like +2/sec stay exact and current
+    # health remains an integer. Never overheals or revives the dead.
+    def regenerate_health(unit)
+      regen = unit.stats[:health_regen].to_f
+      return unless regen.positive? && unit.alive? && unit.current_health < unit.stats[:health]
+
+      unit.heal_progress += regen * @tick_seconds
+      whole = unit.heal_progress.floor
+      return unless whole.positive?
+
+      unit.heal_progress -= whole
+      unit.current_health = [unit.current_health + whole, unit.stats[:health]].min
+    end
+
+    # Battle-start auras: each aura-carrying unit buffs (or debuffs) the stat of
+    # every ally/enemy within its range, snapshotted on the opening formation
+    # (Beacon of Vigor, Aegis Standard, Withering Aura). A static stat delta —
+    # consistent with the other battle-start passives; positions at t=0.
+    def apply_auras(state)
+      state.units.each do |source|
+        next if source.auras.empty?
+
+        source.auras.each do |aura|
+          pool = aura["target"] == "enemy" ? state.enemies_of(source) : state.allies_of(source)
+          stat = aura["stat"].to_sym
+          amount = aura["amount"].to_i
+          range = aura["range"].to_i
+          pool.each do |u|
+            next unless u.alive? && Grid.manhattan(source.position, u.position) <= range
+            u.stats[stat] = (u.stats[stat] || 0) + amount
+          end
+        end
+      end
+    end
 
     def step(state)
       tick_statuses(state)
@@ -90,6 +146,7 @@ module Combat
 
     def regen_and_cooldowns(unit)
       unit.mana = [unit.mana + unit.stats[:mana_regen], unit.stats[:mana_cap]].min
+      regenerate_health(unit)
       unit.attack_cooldown -= 1 if unit.attack_cooldown.positive?
       unit.ability_cooldowns.each_key do |k|
         unit.ability_cooldowns[k] -= 1 if unit.ability_cooldowns[k].positive?
@@ -98,6 +155,8 @@ module Combat
 
     # Tries abilities in the unit's priority order; casts the first castable one.
     def try_cast(unit, state)
+      return false if silenced?(unit, state)
+
       unit.abilities.each do |ability_name|
         ability = Abilities::Registry.fetch(ability_name)
         next unless ability&.castable?(unit, state)
@@ -108,14 +167,30 @@ module Combat
       false
     end
 
+    # A unit is silenced (cannot cast) while any living enemy that carries a
+    # silence aura (e.g. Nullification Orb) is within that enemy's aura radius.
+    def silenced?(unit, state)
+      state.enemies_of(unit).any? do |e|
+        e.alive? && e.silence_aura.positive? &&
+          Grid.manhattan(unit.position, e.position) <= e.silence_aura
+      end
+    end
+
     def try_attack(unit, target, state)
       return false unless Grid.manhattan(unit.position, target.position) <= unit.stats[:attack_range]
       return false unless unit.attack_cooldown.zero?
 
-      dmg = Damage.physical(raw: unit.stats[:attack_damage], attacker: unit, defender: target)
+      raw = unit.stats[:attack_damage]
+      raw = [raw, target.stats[:attack_damage]].max if unit.scales_to_target # Scales of Power
+      # Fellborn Blade: bonus vs targets with more max health than the wielder.
+      raw += unit.bonus_vs_higher_max_health if unit.bonus_vs_higher_max_health.positive? &&
+                                                 target.stats[:health] > unit.stats[:health]
+      dmg = Damage.physical(raw: raw, attacker: unit, defender: target)
       target.current_health -= dmg
       target.current_health = 0 if target.current_health.negative?
       unit.attack_cooldown = unit.attack_cooldown_ticks(@tick_seconds)
+      apply_lifesteal(unit, dmg)
+      ramp_attack(unit) # Frenzy
 
       @events << { tick: state.tick, type: "attack", source_id: unit.id,
                    target_id: target.id, damage: dmg,
@@ -144,11 +219,39 @@ module Combat
       attacker.on_hit.each do |effect|
         next unless state.prng.chance?(effect["chance"].to_f)
 
-        StatusEffects.apply(target, kind: effect["type"], damage: effect["damage"],
-                            duration: effect["duration"], source_id: attacker.id)
+        applied = StatusEffects.apply(
+          target, kind: effect["type"],
+          damage: effect["damage"].to_i + attacker.dot_bonus_damage,       # Plaguebearer
+          duration: effect["duration"].to_i + attacker.dot_bonus_duration,
+          source_id: attacker.id
+        )
+        next unless applied # target immune (e.g. Absolute Resolve)
+
         @events << { tick: state.tick, type: "status_applied", unit_id: target.id,
                      effect: effect["type"], source_id: attacker.id }
       end
+    end
+
+    # Blade of Dromoz: heal the attacker for a fraction of damage dealt, capped
+    # at max health. Silent (no event) — reflected in later state + snapshot.
+    def apply_lifesteal(unit, dmg)
+      return unless unit.lifesteal.positive? && unit.alive?
+
+      heal = (dmg * unit.lifesteal).round
+      return unless heal.positive?
+
+      unit.current_health = [unit.current_health + heal, unit.stats[:health]].min
+    end
+
+    # Frenzy: permanently raise attack_damage by a fixed step per attack, up to a
+    # total cap, for the rest of the battle.
+    def ramp_attack(unit)
+      step = unit.attack_gain_per_attack
+      return unless step.positive? && unit.attack_gained < unit.attack_gain_cap
+
+      gain = [step, unit.attack_gain_cap - unit.attack_gained].min
+      unit.attack_gained += gain
+      unit.stats[:attack_damage] += gain
     end
 
     def move(unit, target, state)

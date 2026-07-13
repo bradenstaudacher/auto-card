@@ -47,4 +47,9 @@ export const api = {
       method: 'PATCH',
       body: { order },
     }),
+  reorderCards: (runId, playerId, orderedIds) =>
+    request(`/runs/${runId}/player_cards/reorder`, {
+      method: 'PATCH',
+      body: { player_id: playerId, ordered_ids: orderedIds },
+    }),
 }

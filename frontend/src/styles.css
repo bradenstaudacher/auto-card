@@ -48,6 +48,53 @@
 
 .game-layout { display: grid; grid-template-columns: 220px 1fr; gap: 14px; flex: 1; min-height: 0; }
 
+/* Battle reuses the planning skeleton: board centered in the stage, log on the
+   right, controls directly under the board — so Lock In & Fight no longer jumps
+   to a different screen. */
+.battle-layout { grid-template-columns: 1fr 300px; }
+.battle-layout .battle-log { height: auto; max-height: none; }
+
+/* In-place battle: the whole prep shell (bench, tableau, header) stays mounted;
+   only the stage swaps to the animation. Bench/tableau go read-only so you
+   can't drag mid-fight. */
+.battle-mode .bench, .battle-mode .tableau { pointer-events: none; opacity: .75; }
+.battle-status { font-weight: 700; color: var(--muted); }
+.battle-status.win { color: #6ce39a; }
+.battle-status.loss { color: #ff8080; }
+
+/* Floating, collapsible battle log — position:fixed so it overlays without
+   shifting the board a single pixel. */
+.battle-log-float { position: fixed; top: 66px; right: 20px; width: 264px; z-index: 40;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 10px 34px rgba(0,0,0,.45); max-height: 62vh; display: flex; flex-direction: column; }
+.battle-log-float.collapsed { width: 150px; }
+.log-float-head { background: transparent; border: none; color: var(--muted); font: inherit;
+  font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; padding: 11px 13px;
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.log-float-body { overflow-y: auto; padding: 0 13px 12px; font-size: 13px; }
+
+/* --- Battle unit visuals: cast burst, mana orb, status badges --- */
+.cast-burst { position: absolute; inset: 0; margin: auto; width: 78%; aspect-ratio: 1;
+  border-radius: 50%; border: 3px solid #6cf; z-index: 1; pointer-events: none;
+  animation: cast-ring .6s ease-out forwards; }
+@keyframes cast-ring {
+  0%   { transform: scale(.45); opacity: .95; }
+  100% { transform: scale(2); opacity: 0; }
+}
+/* Stronger pop on the caster's token the moment it fires. */
+.replay-unit.casting .unit-token { animation: cast-pop .45s ease-out; }
+@keyframes cast-pop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
+
+.mana-orb { position: absolute; top: -4px; right: -4px; width: 15px; height: 15px;
+  border-radius: 50%; z-index: 3; display: grid; place-items: center; box-shadow: 0 0 0 1.5px #0a0f1a; }
+.mana-orb-dot { width: 5px; height: 5px; border-radius: 50%; background: #0a0f1a; }
+
+.status-badges { position: absolute; bottom: 7px; left: -3px; display: flex; gap: 2px; z-index: 3; }
+.status-badge { width: 14px; height: 14px; border-radius: 50%; font-size: 8px; line-height: 1;
+  display: grid; place-items: center; box-shadow: 0 0 0 1.5px #0a0f1a;
+  animation: status-pulse 1.1s ease-in-out infinite; }
+@keyframes status-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
 /* --- Bench --- */
 .bench, .battle-log { background: var(--panel); border: 1px solid var(--border);
   border-radius: 12px; padding: 12px; overflow-y: auto; }
@@ -206,6 +253,8 @@
   background: linear-gradient(135deg,#c9a24b,#e3c877); color: #2a2210; vertical-align: middle; }
 .combine-progress { margin-top: 4px; font-size: 10px; font-weight: 600; color: #e3b34b;
   text-transform: uppercase; letter-spacing: .5px; }
+/* Drop-before indicator while reordering the tableau. */
+.tableau-list .card.drag-over { box-shadow: -3px 0 0 0 #e3b34b, 0 0 10px rgba(227,179,75,.5); }
 
 /* --- Feature batch: discard, bench equips, combine toast --- */
 .card { position: relative; }

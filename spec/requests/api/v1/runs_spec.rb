@@ -61,5 +61,21 @@ RSpec.describe "Api::V1::Runs", type: :request do
       get "/api/v1/runs/999999"
       expect(response).to have_http_status(:not_found)
     end
+
+    it "self-heals a stuck trio of duplicates when the tableau is viewed" do
+      # Simulate a trio that formed without the reward-select combine firing
+      # (e.g. legacy data). Fetching the run during preparation should fuse it.
+      session = RunOrchestrator.start_single_player(user: User.create!(handle: "heal"))
+      player = session.players.first
+      cleave = CardTemplate.find_by(key: "card_cleave")
+      3.times { player.player_cards.create!(card_template: cleave) }
+      expect(player.player_cards.where(card_template: cleave).count).to eq(3)
+
+      get "/api/v1/runs/#{session.id}"
+      expect(response).to have_http_status(:ok)
+      tableau = json["players"].first["tableau"]
+      expect(tableau.size).to eq(1)
+      expect(tableau.first["name"]).to eq("Cleave II")
+    end
   end
 end

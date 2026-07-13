@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Auto Card — Content Browser</title>
+<style>
+  :root {
+    --bg: #14161c;
+    --panel: #1c1f28;
+    --panel-2: #232734;
+    --border: #2e3342;
+    --text: #e8eaf0;
+    --muted: #9aa0b0;
+    --accent: #7fb2e6;
+    --common: #8b909e;
+    --uncommon: #4fb56b;
+    --rare: #d9a441;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    padding: 20px 28px 12px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #1a1d26, #14161c);
+  }
+  header h1 { margin: 0; font-size: 20px; letter-spacing: 0.5px; }
+  header .meta { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .controls {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    padding: 12px 28px;
+    background: rgba(20,22,28,0.95);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--border);
+  }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tab {
+    padding: 6px 12px; border-radius: 6px; cursor: pointer;
+    background: var(--panel); border: 1px solid var(--border); color: var(--muted);
+    font-size: 13px; user-select: none;
+  }
+  .tab:hover { color: var(--text); border-color: #3d4255; }
+  .tab.active { background: var(--accent); color: #0d1a2b; border-color: var(--accent); font-weight: 600; }
+  .tab .count { opacity: 0.7; margin-left: 5px; font-size: 11px; }
+  .spacer { flex: 1; }
+  input[type=search] {
+    padding: 7px 11px; border-radius: 6px; min-width: 200px;
+    background: var(--panel); border: 1px solid var(--border); color: var(--text);
+    font-size: 13px;
+  }
+  .typefilter { display: flex; gap: 5px; }
+  .chip {
+    width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+    display: grid; place-items: center; font-size: 13px;
+    border: 2px solid transparent; opacity: 0.45; transition: opacity .12s;
+  }
+  .chip.on { opacity: 1; border-color: #fff6; }
+  main { padding: 20px 28px 60px; }
+  .section-title { font-size: 15px; margin: 24px 0 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .card-head {
+    display: flex; align-items: center; gap: 9px; padding: 11px 13px;
+    border-bottom: 1px solid var(--border);
+  }
+  .glyph {
+    width: 30px; height: 30px; border-radius: 7px; flex: none;
+    display: grid; place-items: center; font-size: 16px; font-weight: 700;
+  }
+  .card-title { font-weight: 600; font-size: 14px; line-height: 1.2; }
+  .card-sub { color: var(--muted); font-size: 11px; margin-top: 1px; }
+  .card-body { padding: 11px 13px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+  .desc { color: #cfd3de; font-size: 13px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag {
+    font-size: 11px; padding: 2px 7px; border-radius: 5px;
+    background: var(--panel-2); border: 1px solid var(--border); color: var(--muted);
+  }
+  .tag.rarity-common { color: var(--common); }
+  .tag.rarity-uncommon { color: var(--uncommon); border-color: #2f5a3a; }
+  .tag.rarity-rare { color: var(--rare); border-color: #6b5220; }
+  .tag.impl-false { color: #d67f7f; border-color: #5a2f2f; }
+  .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px 12px; font-size: 12px; }
+  .stat { display: flex; justify-content: space-between; border-bottom: 1px dotted #2a2e3a; padding: 1px 0; }
+  .stat .k { color: var(--muted); }
+  .rules { font-size: 11px; color: #8f95a5; font-family: ui-monospace, Menlo, monospace; white-space: pre-wrap; word-break: break-word; }
+  .empty { color: var(--muted); padding: 40px; text-align: center; }
+  .rounds-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .rounds-table th, .rounds-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+  .rounds-table th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+  .rounds-table tr.boss td { background: #2a1f14; }
+</style>
+</head>
+<body>
+<header>
+  <h1>⚔ Auto Card — Content Browser</h1>
+  <div class="meta" id="meta"></div>
+</header>
+<div class="controls">
+  <div class="tabs" id="tabs"></div>
+  <div class="spacer"></div>
+  <div class="typefilter" id="typefilter"></div>
+  <input type="search" id="search" placeholder="Search name / description…" />
+</div>
+<main id="main"></main>
+
+<script id="game-data" type="application/json">__GAME_DATA__</script>
+<script>
+const DATA = JSON.parse(document.getElementById('game-data').textContent);
+
+const TYPE_COLORS = { Occult: '#8b3fd6', Holy: '#f4e88a', Law: '#7fb2e6', Fury: '#d63a4a', Death: '#1c1c22' };
+const TYPE_TEXT   = { Occult: '#fff', Holy: '#3a3320', Law: '#12314f', Fury: '#fff', Death: '#f2f2f2' };
+const TYPE_GLYPH  = { Occult: '⚗', Holy: '☀', Law: '⚖', Fury: '⚔', Death: '☠' };
+const TYPES = ['Fury', 'Law', 'Occult', 'Death', 'Holy'];
+const NEUTRAL = '#4a4f5e';
+
+// Normalize every content item into a common shape the renderer can filter.
+const CARDS_BY_CAT = {};
+for (const c of DATA.cards) (CARDS_BY_CAT[c.category] ||= []).push(c);
+
+const SECTIONS = [
+  { id: 'champions',  label: 'Champions',  items: DATA.champions,            render: renderChampion },
+  { id: 'ability',    label: 'Abilities',  items: CARDS_BY_CAT.ability || [], render: renderCard, abilityMeta: true },
+  { id: 'weapon',     label: 'Weapons',    items: CARDS_BY_CAT.weapon || [],  render: renderCard },
+  { id: 'equipment',  label: 'Equipment',  items: CARDS_BY_CAT.equipment || [], render: renderCard },
+  { id: 'passive',    label: 'Passives',   items: CARDS_BY_CAT.passive || [], render: renderCard },
+  { id: 'modifier',   label: 'Modifiers',  items: CARDS_BY_CAT.modifier || [], render: renderCard },
+  { id: 'monsters',   label: 'Monsters',   items: DATA.monsters,             render: renderMonster },
+  { id: 'rounds',     label: 'Rounds',     items: DATA.rounds,               render: null },
+];
+
+const state = { section: 'champions', search: '', types: new Set() };
+
+function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; }
+function esc(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function glyphStyle(type) {
+  const bg = TYPE_COLORS[type] || NEUTRAL;
+  const fg = TYPE_TEXT[type] || '#fff';
+  return `background:${bg};color:${fg}`;
+}
+
+function statRows(stats) {
+  const order = ['health','attack_damage','magic_power','armor','shield','mana_cap','mana_regen','movement_speed','attack_range','attack_speed'];
+  const keys = order.filter(k => stats[k] != null).concat(Object.keys(stats).filter(k => !order.includes(k)));
+  return `<div class="stats">${keys.map(k =>
+    `<div class="stat"><span class="k">${esc(k.replace(/_/g,' '))}</span><span>${esc(stats[k])}</span></div>`).join('')}</div>`;
+}
+
+function slotSummary(sc) {
+  if (!sc) return '';
+  const parts = [['weapon_slots','wpn'],['ability_slots','abil'],['equipment_slots','equip'],['passive_slots','pass']]
+    .filter(([k]) => sc[k]).map(([k,l]) => `${sc[k]} ${l}`);
+  return parts.length ? `<div class="tags">${parts.map(p => `<span class="tag">${esc(p)}</span>`).join('')}</div>` : '';
+}
+
+function renderChampion(c) {
+  return `<div class="card">
+    <div class="card-head">
+      <div class="glyph" style="${glyphStyle(c.type)}">${TYPE_GLYPH[c.type] || '?'}</div>
+      <div><div class="card-title">${esc(c.name)}</div>
+      <div class="card-sub">${esc(c.type)} · ${esc(c.subclass || '')}</div></div>
+    </div>
+    <div class="card-body">
+      <div class="desc">${esc(c.role || '')}</div>
+      <div class="tags">${(c.default_abilities||[]).map(a => `<span class="tag">★ ${esc(a)}</span>`).join('')}</div>
+      ${slotSummary(c.slot_config)}
+      ${statRows(c.base_stats || {})}
+    </div></div>`;
+}
+
+function renderMonster(m) {
+  return `<div class="card">
+    <div class="card-head">
+      <div class="glyph" style="${glyphStyle(m.type)}">${TYPE_GLYPH[m.type] || '?'}</div>
+      <div><div class="card-title">${esc(m.name)}</div>
+      <div class="card-sub">${esc(m.type)} · ${esc(m.tier || '')}</div></div>
+    </div>
+    <div class="card-body">
+      <div class="desc">${esc(m.role || '')}</div>
+      ${(m.default_abilities||[]).length ? `<div class="tags">${m.default_abilities.map(a => `<span class="tag">★ ${esc(a)}</span>`).join('')}</div>` : ''}
+      ${statRows(m.base_stats || {})}
+    </div></div>`;
+}
+
+// Ability metadata from abilities.yml, keyed by name, for the Abilities tab.
+const ABILITY_META = {};
+for (const a of DATA.abilities) ABILITY_META[a.name] = a;
+
+function renderCard(c, opts = {}) {
+  const type = c.type_affinity;
+  const tags = [];
+  if (c.rarity) tags.push(`<span class="tag rarity-${c.rarity}">${esc(c.rarity)}</span>`);
+  if (c.slot_type) tags.push(`<span class="tag">${esc(c.slot_type)}</span>`);
+  if (c.tier) tags.push(`<span class="tag">tier ${esc(c.tier)}</span>`);
+  if (c.upgrades_to) tags.push(`<span class="tag">↑ upgrades</span>`);
+
+  let meta = '';
+  if (opts.abilityMeta) {
+    const am = ABILITY_META[c.rules && c.rules.ability_name];
+    if (am) {
+      const bits = [`${am.mana_cost} mana`, `rng ${am.range}`, esc(am.targeting), esc(am.damage_type)];
+      meta = `<div class="tags">${bits.map(b => `<span class="tag">${b}</span>`).join('')}` +
+        (am.implemented === false ? `<span class="tag impl-false">not implemented</span>` : '') + `</div>`;
+    }
+  }
+  const rules = c.rules && Object.keys(c.rules).length ? `<div class="rules">${esc(JSON.stringify(c.rules))}</div>` : '';
+  return `<div class="card">
+    <div class="card-head">
+      <div class="glyph" style="${glyphStyle(type)}">${TYPE_GLYPH[type] || '◆'}</div>
+      <div><div class="card-title">${esc(c.name)}</div>
+      <div class="card-sub">${esc(type || 'Neutral')}</div></div>
+    </div>
+    <div class="card-body">
+      <div class="desc">${esc(c.description || '')}</div>
+      <div class="tags">${tags.join('')}</div>
+      ${meta}
+      ${rules}
+    </div></div>`;
+}
+
+function renderRounds(rounds) {
+  const rows = rounds.map(r => `<tr class="${r.boss ? 'boss' : ''}">
+    <td>${r.round}${r.boss ? ' 👑' : ''}</td>
+    <td>${r.player_slots}</td>
+    <td>${esc((r.monsters||[]).join(', '))}</td>
+    <td>×${r.stat_scale}</td>
+    <td>${r.reward_choices_on_win} / ${r.reward_choices_on_loss}</td>
+  </tr>`).join('');
+  return `<table class="rounds-table"><thead><tr>
+    <th>Round</th><th>Deploy</th><th>Monsters</th><th>Scale</th><th>Rewards W/L</th>
+  </tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function matches(item) {
+  const q = state.search.toLowerCase();
+  if (q) {
+    const hay = [item.name, item.description, item.role, item.subclass].filter(Boolean).join(' ').toLowerCase();
+    if (!hay.includes(q)) return false;
+  }
+  if (state.types.size) {
+    const t = item.type || item.type_affinity;
+    if (!t || !state.types.has(t)) return false;
+  }
+  return true;
+}
+
+function render() {
+  document.getElementById('meta').textContent =
+    `Generated ${DATA.generated_at} · ${DATA.champions.length} champions · ${DATA.cards.length} cards · ${DATA.monsters.length} monsters`;
+
+  // Tabs
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = '';
+  for (const s of SECTIONS) {
+    const t = el(`<div class="tab ${s.id === state.section ? 'active' : ''}">${s.label}<span class="count">${s.items.length}</span></div>`);
+    t.onclick = () => { state.section = s.id; render(); };
+    tabs.appendChild(t);
+  }
+
+  // Type filter chips
+  const tf = document.getElementById('typefilter');
+  tf.innerHTML = '';
+  for (const type of TYPES) {
+    const c = el(`<div class="chip ${state.types.has(type) ? 'on' : ''}" style="${glyphStyle(type)}" title="${type}">${TYPE_GLYPH[type]}</div>`);
+    c.onclick = () => { state.types.has(type) ? state.types.delete(type) : state.types.add(type); render(); };
+    tf.appendChild(c);
+  }
+
+  const section = SECTIONS.find(s => s.id === state.section);
+  const main = document.getElementById('main');
+  if (section.id === 'rounds') { main.innerHTML = renderRounds(section.items); return; }
+
+  const shown = section.items.filter(matches);
+  main.innerHTML = shown.length
+    ? `<div class="grid">${shown.map(i => section.render(i, section)).join('')}</div>`
+    : `<div class="empty">No matches.</div>`;
+}
+
+document.getElementById('search').addEventListener('input', e => { state.search = e.target.value; render(); });
+render();
+</script>
+</body>
+</html>

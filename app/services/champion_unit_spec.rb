@@ -25,7 +25,18 @@ class ChampionUnitSpec
       stats: stats,
       abilities: abilities,
       on_hit: on_hit_effects,
-      modifiers: roster_modifiers
+      modifiers: roster_modifiers,
+      start_effects: start_effects,
+      immunities: immunities,
+      silence_aura: silence_aura,
+      scales_to_target: scales_to_target,
+      lifesteal: combat_effect_max("lifesteal"),
+      bonus_vs_higher_max_health: combat_effect_max("bonus_vs_higher_max_health"),
+      attack_gain_per_attack: combat_effect_max("attack_gain_per_attack"),
+      attack_gain_cap: combat_effect_max("attack_gain_cap"),
+      auras: auras,
+      dot_bonus_damage: combat_effect_max("dot_bonus_damage"),
+      dot_bonus_duration: combat_effect_max("dot_bonus_duration")
     }
   end
 
@@ -97,6 +108,71 @@ class ChampionUnitSpec
       end
     end
     mods
+  end
+
+  # Passive combat_effects that fire once at battle start (self-buffs conditional
+  # on adjacency), e.g. Lawful Formation armor, Martyr's Vow shield. Summed by
+  # kind; the simulator applies them before the first tick.
+  START_EFFECT_KINDS = %w[adjacent_ally_armor adjacent_ally_shield].freeze
+
+  def start_effects
+    effects = Hash.new(0)
+    equipped_cards.each do |card|
+      (card.card_template.rules["combat_effects"] || {}).each do |kind, amount|
+        effects[kind] += amount if START_EFFECT_KINDS.include?(kind)
+      end
+    end
+    effects
+  end
+
+  # Status kinds the champion is immune to, from any equipped card's
+  # combat_effects.status_immunity (e.g. Absolute Resolve). Deduplicated.
+  def immunities
+    equipped_cards.flat_map do |card|
+      Array((card.card_template.rules["combat_effects"] || {})["status_immunity"])
+    end.uniq
+  end
+
+  # Largest silence-aura radius among equipped cards (Nullification Orb). Enemies
+  # within this range of the champion cannot cast.
+  def silence_aura
+    equipped_cards.map do |card|
+      (card.card_template.rules["combat_effects"] || {})["silence_aura"].to_i
+    end.max || 0
+  end
+
+  # Scales of Power: true if any equipped card grants the target-scaling basic
+  # attack.
+  def scales_to_target
+    equipped_cards.any? do |card|
+      (card.card_template.rules["combat_effects"] || {})["scales_to_target"]
+    end
+  end
+
+  # Battle-start auras from equipped cards. Each aura combat_effect maps to a
+  # target stat + who it affects; radius comes from the card's aura_range (2).
+  AURA_EFFECTS = {
+    "ally_aura_health_regen" => { stat: "health_regen", target: "ally" },
+    "ally_aura_armor"        => { stat: "armor",        target: "ally" },
+    "enemy_aura_attack"      => { stat: "attack_damage", target: "enemy" },
+  }.freeze
+
+  def auras
+    equipped_cards.flat_map do |card|
+      effects = card.card_template.rules["combat_effects"] || {}
+      range = (effects["aura_range"] || 2).to_i
+      AURA_EFFECTS.filter_map do |key, spec|
+        next unless effects[key]
+        { "stat" => spec[:stat], "amount" => effects[key], "range" => range, "target" => spec[:target] }
+      end
+    end
+  end
+
+  # Largest value of a numeric combat_effect across equipped cards (0 if none).
+  def combat_effect_max(key)
+    equipped_cards.map do |card|
+      (card.card_template.rules["combat_effects"] || {})[key]
+    end.compact.max || 0
   end
 
   def roster_modifier_cards

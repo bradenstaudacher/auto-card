@@ -23,11 +23,14 @@ class CardCombiner
 
       template, cards = merge
       ApplicationRecord.transaction do
-        cards.first(THRESHOLD).each do |card|
+        consumed = cards.first(THRESHOLD)
+        # Land the upgraded card where the trio sat so the tableau doesn't reshuffle.
+        slot = consumed.map(&:position).min
+        consumed.each do |card|
           CardAssignment.unassign(card) if card.assigned?
           card.destroy!
         end
-        upgraded = @player.player_cards.create!(card_template: template.upgrade_template)
+        upgraded = @player.player_cards.create!(card_template: template.upgrade_template, position: slot)
         produced << upgraded.card_template.name
       end
     end

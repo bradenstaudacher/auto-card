@@ -35,6 +35,26 @@ module Api
         render_run(session.reload)
       end
 
+      # PATCH /api/v1/runs/:run_id/player_cards/reorder
+      #   { player_id, ordered_ids: [cardId, ...] }
+      # Persists the tableau's display order. Only the listed cards are touched,
+      # and only ones belonging to the given player in this session.
+      def reorder
+        session = load_session
+        return preparation_error unless session.status == "preparation"
+
+        player = session.players.find(params.require(:player_id))
+        ordered_ids = Array(params.require(:ordered_ids)).map(&:to_i)
+        cards = player.player_cards.where(id: ordered_ids).index_by(&:id)
+
+        ActiveRecord::Base.transaction do
+          ordered_ids.each_with_index do |card_id, index|
+            cards[card_id]&.update!(position: index)
+          end
+        end
+        render_run(session.reload)
+      end
+
       private
 
       def load_session

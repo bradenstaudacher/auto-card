@@ -24,6 +24,19 @@ RSpec.describe "Api::V1 loadouts", type: :request do
     expect(c["equipped"].map { |e| e["name"] }).to include("Serrated Blade")
   end
 
+  it "reorders the tableau and persists the new order" do
+    a = player.player_cards.create!(card_template: CardTemplate.find_by(key: "card_serrated_blade"))
+    b = player.player_cards.create!(card_template: CardTemplate.find_by(key: "card_cleave"))
+    c = player.player_cards.create!(card_template: CardTemplate.find_by(key: "card_lawful_formation"))
+
+    patch "/api/v1/runs/#{session.id}/player_cards/reorder",
+          params: { player_id: player.id, ordered_ids: [c.id, a.id, b.id] }, as: :json
+    expect(response).to have_http_status(:ok)
+
+    order = json["players"].first["tableau"].map { |t| t["id"] }
+    expect(order).to eq([c.id, a.id, b.id])
+  end
+
   it "rejects a card the champion's subclass can't use" do
     alch = player.player_characters.joins(:champion_template).find_by(champion_templates: { key: "violet_alchemist" })
     post "/api/v1/runs/#{session.id}/player_cards/#{blade.id}/assign",

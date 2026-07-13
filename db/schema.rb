@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_07_12_120000) do
+ActiveRecord::Schema[7.1].define(version: 2026_07_12_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -81,6 +81,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_12_120000) do
     t.integer "assigned_slot_index"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "position", default: 0, null: false
     t.index ["assigned_to_player_character_id"], name: "index_player_cards_on_assigned_to_player_character_id"
     t.index ["card_template_id"], name: "index_player_cards_on_card_template_id"
     t.index ["player_id"], name: "index_player_cards_on_player_id"

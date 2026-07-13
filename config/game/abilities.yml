@@ -65,6 +65,30 @@ abilities:
     implemented: true
     description: Sear an enemy for 150% magic power — devastating against Occult.
 
+  - name: Dawnbreak
+    type: Holy
+    category: ability
+    damage_type: magic
+    mana_cost: 5
+    targeting: enemy
+    range: 3
+    implemented: true
+    description: >-
+      Sears the target and enemies adjacent to it for 130% magic power, then
+      wards allies adjacent to the caster with +50% magic power as shield.
+
+  - name: Soul Crush
+    type: Death
+    category: ability
+    damage_type: "true"
+    mana_cost: 3
+    targeting: enemy
+    range: 3
+    implemented: true
+    description: >-
+      Deals true damage equal to 40% of the caster's magic power, ignoring
+      armor, shield, and type advantage. An anti-tank / anti-shield answer.
+
   - name: Fury Strike
     type: Fury
     category: ability

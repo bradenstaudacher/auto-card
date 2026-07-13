@@ -12,6 +12,11 @@ Rails.application.routes.draw do
       post "coop", to: "coop#create"
       post "coop/join", to: "coop#join"
 
+      # Content brainstorm board (public/board.html)
+      resources :drafts, only: %i[index create update destroy] do
+        post :promote, on: :collection
+      end
+
       resources :runs, only: %i[create show] do
         resources :placements, only: %i[create]
         resources :rewards, only: [] do
@@ -22,6 +27,7 @@ Rails.application.routes.draw do
             post :assign
             post :unassign
           end
+          patch :reorder, on: :collection
         end
         resources :player_characters, only: [] do
           patch :ability_order, on: :member

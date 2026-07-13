@@ -1,0 +1,758 @@
+{
+  "drafts": [
+    {
+      "name": "Radiant Censer",
+      "category": "weapon",
+      "type_affinity": "Holy",
+      "rarity": "uncommon",
+      "slot_type": "weapon",
+      "tier": null,
+      "description": "+5 magic power, +1 attack range. A caster weapon built for the Dawn Cleric.",
+      "rules": {
+        "stat_modifiers": {
+          "magic_power": 5,
+          "attack_range": 1
+        }
+      },
+      "id": "draft_fae8bfbf",
+      "status": "accepted",
+      "notes": "Good as is",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Giant Shield",
+      "category": "equipment",
+      "type_affinity": null,
+      "rarity": "uncommon",
+      "slot_type": "equipment",
+      "tier": 1,
+      "description": "+6 shield, +2 armor.",
+      "rules": {
+        "stat_modifiers": {
+          "shield": 6,
+          "armor": 2
+        }
+      },
+      "id": "draft_ffbe2ff3",
+      "status": "accepted",
+      "notes": "✓ Added L2 + L3 upgrade chain as requested. Whole chain accepted so it promotes together.",
+      "origin": "brainstorm",
+      "key": "card_giant_shield",
+      "upgrades_to": "card_giant_shield_2",
+      "promoted": true
+    },
+    {
+      "name": "Magicians Charm",
+      "category": "equipment",
+      "type_affinity": null,
+      "rarity": "common",
+      "slot_type": "equipment",
+      "tier": null,
+      "description": "+2 magic power, +2 mana cap.",
+      "rules": {
+        "stat_modifiers": {
+          "magic_power": 2,
+          "mana_cap": 2
+        }
+      },
+      "id": "draft_126947ab",
+      "status": "accepted",
+      "notes": "Ready to ship — pure stat_modifiers.",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Second Wind",
+      "category": "passive",
+      "type_affinity": null,
+      "rarity": "uncommon",
+      "slot_type": "passive",
+      "tier": null,
+      "description": "+20 health, +0.5 mana regen. Generic survivability passive.",
+      "rules": {
+        "stat_modifiers": {
+          "health": 20,
+          "mana_regen": 0.5
+        }
+      },
+      "id": "draft_7921bb90",
+      "status": "accepted",
+      "notes": "Ready to ship — pure stat_modifiers.",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Martyrs Vow",
+      "category": "passive",
+      "type_affinity": "Holy",
+      "rarity": "rare",
+      "slot_type": "passive",
+      "tier": 1,
+      "description": "+3 shield while adjacent to an ally at battle start.",
+      "rules": {
+        "combat_effects": {
+          "adjacent_ally_shield": 3
+        }
+      },
+      "id": "draft_7025f215",
+      "status": "accepted",
+      "notes": "✓ Engine-ready. Added L2. Chain accepted so it promotes together.",
+      "origin": "brainstorm",
+      "key": "card_martyrs_vow",
+      "upgrades_to": "card_martyrs_vow_2",
+      "promoted": true
+    },
+    {
+      "name": "Dawnbreak",
+      "category": "ability",
+      "type_affinity": "Holy",
+      "rarity": "rare",
+      "slot_type": "ability",
+      "tier": null,
+      "description": "Sear the target and adjacent enemies for 130% magic power; ward allies next to you with shield (50% magic power).",
+      "rules": {
+        "ability_name": "Dawnbreak",
+        "ability_params": {
+          "power_scale": 1.3,
+          "shield_scale": 0.5
+        }
+      },
+      "id": "draft_8b21c5c1",
+      "status": "accepted",
+      "notes": "✓ Engine implemented (Combat::Abilities::Dawnbreak, registered, in abilities.yml, specs pass). Safe to promote.",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Orthodox Scepter",
+      "category": "weapon",
+      "type_affinity": "Holy",
+      "rarity": "uncommon",
+      "slot_type": "weapon",
+      "tier": null,
+      "description": "+6 magic power, +0.75 mana regen.",
+      "rules": {
+        "stat_modifiers": {
+          "magic_power": 6,
+          "mana_regen": 0.75
+        }
+      },
+      "id": "draft_f695064f",
+      "status": "accepted",
+      "notes": "Ready to ship — pure stat_modifiers, no engine work.",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Giant Shield II",
+      "category": "equipment",
+      "rarity": "rare",
+      "slot_type": "equipment",
+      "tier": 2,
+      "key": "card_giant_shield_2",
+      "upgrades_to": "card_giant_shield_3",
+      "description": "+10 shield, +3 armor.",
+      "rules": {
+        "stat_modifiers": {
+          "shield": 10,
+          "armor": 3
+        }
+      },
+      "id": "draft_4f3ce00d",
+      "status": "accepted",
+      "notes": "Tier 2 of the Giant Shield chain.",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Giant Shield III",
+      "category": "equipment",
+      "rarity": "rare",
+      "slot_type": "equipment",
+      "tier": 3,
+      "key": "card_giant_shield_3",
+      "description": "+12 shield, +5 armor.",
+      "rules": {
+        "stat_modifiers": {
+          "shield": 12,
+          "armor": 5
+        }
+      },
+      "id": "draft_77d03175",
+      "status": "accepted",
+      "notes": "Tier 3 (final) of the Giant Shield chain.",
+      "origin": "brainstorm",
+      "type_affinity": null,
+      "promoted": true
+    },
+    {
+      "name": "Martyrs Vow II",
+      "category": "passive",
+      "type_affinity": "Holy",
+      "rarity": "rare",
+      "slot_type": "passive",
+      "tier": 2,
+      "key": "card_martyrs_vow_2",
+      "description": "+5 shield while adjacent to an ally at battle start.",
+      "rules": {
+        "combat_effects": {
+          "adjacent_ally_shield": 5
+        }
+      },
+      "id": "draft_7d1a067b",
+      "status": "accepted",
+      "notes": "Tier 2 of Martyrs Vow. Uses the same battle-start ward engine (amount 5).",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Absolute Resolve",
+      "category": "passive",
+      "type_affinity": "Law",
+      "rarity": "rare",
+      "description": "Immune to Burn, Poison, and Bleed. +4 health regen/sec.",
+      "rules": {
+        "stat_modifiers": {
+          "health_regen": 4
+        },
+        "combat_effects": {
+          "status_immunity": [
+            "burn",
+            "poison",
+            "bleed"
+          ]
+        }
+      },
+      "id": "draft_5e6cb053",
+      "status": "accepted",
+      "notes": "✓ Implemented: status immunity (StatusEffects.apply guard) + per-second health_regen. Specs pass.",
+      "origin": "manual",
+      "promoted": true
+    },
+    {
+      "name": "Soul Crush",
+      "category": "ability",
+      "type_affinity": "Death",
+      "rarity": "uncommon",
+      "description": "Deal true damage equal to 40% of magic power, ignoring armor and shield.",
+      "rules": {
+        "ability_name": "Soul Crush",
+        "ability_params": {
+          "power_scale": 0.4
+        }
+      },
+      "id": "draft_66d709ed",
+      "status": "accepted",
+      "notes": "✓ Implemented (Combat::Abilities::SoulCrush, true damage, scales on magic_power). Specs pass.",
+      "origin": "manual",
+      "promoted": true
+    },
+    {
+      "name": "Spyglass",
+      "category": "equipment",
+      "rarity": "common",
+      "description": "+1 attack range.",
+      "rules": {
+        "stat_modifiers": {
+          "attack_range": 1
+        }
+      },
+      "id": "draft_bfb2415c",
+      "status": "accepted",
+      "notes": "✓ Pure stat mod (same as Oaken Staff). Ready.",
+      "origin": "manual",
+      "promoted": true
+    },
+    {
+      "name": "Nullification Orb",
+      "category": "equipment",
+      "type_affinity": "Law",
+      "rarity": "rare",
+      "description": "Enemies within 2 tiles cannot cast abilities.",
+      "rules": {
+        "combat_effects": {
+          "silence_aura": 2
+        }
+      },
+      "id": "draft_7b56fd22",
+      "status": "accepted",
+      "notes": "✓ Implemented: silence aura (Simulator#silenced? guards try_cast). Affects all enemy casters, monsters included. Specs pass.",
+      "origin": "manual",
+      "promoted": true
+    },
+    {
+      "name": "Thick Skin",
+      "category": "passive",
+      "rarity": "uncommon",
+      "description": "+15 health, +2 health regen/sec.",
+      "rules": {
+        "stat_modifiers": {
+          "health": 15,
+          "health_regen": 2
+        }
+      },
+      "id": "draft_899d210c",
+      "status": "accepted",
+      "notes": "✓ Uses new per-second health_regen. Added II/III chain.",
+      "origin": "manual",
+      "tier": 1,
+      "key": "card_thick_skin",
+      "upgrades_to": "card_thick_skin_2",
+      "promoted": true
+    },
+    {
+      "name": "Scales of Power",
+      "category": "weapon",
+      "type_affinity": "Law",
+      "rarity": "rare",
+      "description": "+2 attack damage. Basic attacks use the target's attack power when it exceeds yours.",
+      "rules": {
+        "stat_modifiers": {
+          "attack_damage": 2
+        },
+        "combat_effects": {
+          "scales_to_target": true
+        }
+      },
+      "id": "draft_185320b2",
+      "status": "accepted",
+      "notes": "✓ Implemented (Simulator try_attack borrows max AD). Gave it +2 base attack so it isn't dead vs weaker foes — adjust if you want it pure.",
+      "origin": "manual",
+      "promoted": true
+    },
+    {
+      "name": "Gwanix Flint",
+      "category": "equipment",
+      "type_affinity": "Occult",
+      "rarity": "uncommon",
+      "description": "Basic attacks apply Burn 1.",
+      "rules": {
+        "combat_effects": {
+          "burn": {
+            "chance": 0.3,
+            "damage": 4,
+            "duration": 2
+          }
+        }
+      },
+      "id": "draft_a1d69552",
+      "status": "accepted",
+      "notes": "✓ On-hit burn, reuses Serrated Blade machinery. Added II/III chain.",
+      "origin": "manual",
+      "tier": 1,
+      "key": "card_gwanix_flint",
+      "upgrades_to": "card_gwanix_flint_2",
+      "promoted": true
+    },
+    {
+      "name": "Gwanix Flint II",
+      "category": "equipment",
+      "type_affinity": "Occult",
+      "rarity": "rare",
+      "slot_type": "equipment",
+      "tier": 2,
+      "key": "card_gwanix_flint_2",
+      "upgrades_to": "card_gwanix_flint_3",
+      "description": "Basic attacks apply Burn 2.",
+      "rules": {
+        "combat_effects": {
+          "burn": {
+            "chance": 0.4,
+            "damage": 6,
+            "duration": 2
+          }
+        }
+      },
+      "id": "draft_d6750d5c",
+      "status": "accepted",
+      "notes": "",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Gwanix Flint III",
+      "category": "equipment",
+      "type_affinity": "Occult",
+      "rarity": "rare",
+      "slot_type": "equipment",
+      "tier": 3,
+      "key": "card_gwanix_flint_3",
+      "description": "Basic attacks apply Burn 3.",
+      "rules": {
+        "combat_effects": {
+          "burn": {
+            "chance": 0.5,
+            "damage": 8,
+            "duration": 3
+          }
+        }
+      },
+      "id": "draft_464bc946",
+      "status": "accepted",
+      "notes": "",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Thick Skin II",
+      "category": "passive",
+      "rarity": "rare",
+      "slot_type": "passive",
+      "tier": 2,
+      "key": "card_thick_skin_2",
+      "upgrades_to": "card_thick_skin_3",
+      "description": "+25 health, +3 health regen/sec.",
+      "rules": {
+        "stat_modifiers": {
+          "health": 25,
+          "health_regen": 3
+        }
+      },
+      "id": "draft_0f1b733c",
+      "status": "accepted",
+      "notes": "",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Thick Skin III",
+      "category": "passive",
+      "rarity": "rare",
+      "slot_type": "passive",
+      "tier": 3,
+      "key": "card_thick_skin_3",
+      "description": "+40 health, +4 health regen/sec.",
+      "rules": {
+        "stat_modifiers": {
+          "health": 40,
+          "health_regen": 4
+        }
+      },
+      "id": "draft_8bb0303c",
+      "status": "accepted",
+      "notes": "",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Venom Fang",
+      "category": "weapon",
+      "type_affinity": "Death",
+      "rarity": "common",
+      "slot_type": "weapon",
+      "tier": 1,
+      "key": "card_venom_fang",
+      "upgrades_to": "card_venom_fang_2",
+      "description": "Basic attacks apply Poison 1.",
+      "rules": {
+        "combat_effects": {
+          "poison": {
+            "chance": 0.3,
+            "damage": 4,
+            "duration": 2
+          }
+        }
+      },
+      "id": "draft_dc6a86f7",
+      "status": "accepted",
+      "notes": "🟢 Free — poison + on-hit already exist (twin of Gwanix Flint). Chain of 3.",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Venom Fang II",
+      "category": "weapon",
+      "type_affinity": "Death",
+      "rarity": "uncommon",
+      "slot_type": "weapon",
+      "tier": 2,
+      "key": "card_venom_fang_2",
+      "upgrades_to": "card_venom_fang_3",
+      "description": "Basic attacks apply Poison 2.",
+      "rules": {
+        "combat_effects": {
+          "poison": {
+            "chance": 0.4,
+            "damage": 6,
+            "duration": 2
+          }
+        }
+      },
+      "id": "draft_837401ac",
+      "status": "accepted",
+      "notes": "",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Venom Fang III",
+      "category": "weapon",
+      "type_affinity": "Death",
+      "rarity": "rare",
+      "slot_type": "weapon",
+      "tier": 3,
+      "key": "card_venom_fang_3",
+      "description": "Basic attacks apply Poison 3.",
+      "rules": {
+        "combat_effects": {
+          "poison": {
+            "chance": 0.5,
+            "damage": 8,
+            "duration": 3
+          }
+        }
+      },
+      "id": "draft_e1e0205f",
+      "status": "accepted",
+      "notes": "",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Plaguebearer",
+      "category": "passive",
+      "type_affinity": "Occult",
+      "rarity": "rare",
+      "slot_type": "passive",
+      "description": "Your damage-over-time effects deal +1 per tick and last +1 tick.",
+      "rules": {
+        "combat_effects": {
+          "dot_bonus_damage": 1,
+          "dot_bonus_duration": 1
+        }
+      },
+      "id": "draft_14df7137",
+      "status": "accepted",
+      "notes": "🟡 Needs engine: amplify DoTs THIS unit applies (hook in on-hit apply). Affliction payoff card.",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Soul Crush II",
+      "category": "ability",
+      "type_affinity": "Death",
+      "rarity": "uncommon",
+      "slot_type": "ability",
+      "tier": 2,
+      "key": "card_soul_crush_2",
+      "upgrades_to": "card_soul_crush_3",
+      "description": "Deal true damage equal to 55% of magic power, ignoring armor and shield.",
+      "rules": {
+        "ability_name": "Soul Crush",
+        "ability_params": {
+          "power_scale": 0.55
+        }
+      },
+      "id": "draft_44ad58ab",
+      "status": "accepted",
+      "notes": "🟢 Params only. NOTE: base card_soul_crush is already in core without tier — I'll add tier:1 + upgrades_to when this chain is accepted.",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Soul Crush III",
+      "category": "ability",
+      "type_affinity": "Death",
+      "rarity": "rare",
+      "slot_type": "ability",
+      "tier": 3,
+      "key": "card_soul_crush_3",
+      "description": "Deal true damage equal to 70% of magic power, ignoring armor and shield.",
+      "rules": {
+        "ability_name": "Soul Crush",
+        "ability_params": {
+          "power_scale": 0.7
+        }
+      },
+      "id": "draft_16375dbc",
+      "status": "accepted",
+      "notes": "",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Beacon of Vigor",
+      "category": "equipment",
+      "type_affinity": "Holy",
+      "rarity": "rare",
+      "slot_type": "equipment",
+      "description": "Allies within 2 tiles gain +2 health regen/sec.",
+      "rules": {
+        "combat_effects": {
+          "ally_aura_health_regen": 2,
+          "aura_range": 2
+        }
+      },
+      "id": "draft_c14c4bc1",
+      "status": "accepted",
+      "notes": "🟡 New ally-facing aura (mirror of Nullification's enemy aura). Pairs with Thick Skin/Absolute Resolve.",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Aegis Standard",
+      "category": "equipment",
+      "type_affinity": "Law",
+      "rarity": "rare",
+      "slot_type": "equipment",
+      "description": "Allies within 2 tiles gain +3 armor.",
+      "rules": {
+        "combat_effects": {
+          "ally_aura_armor": 3,
+          "aura_range": 2
+        }
+      },
+      "id": "draft_50391894",
+      "status": "accepted",
+      "notes": "🟡 New ally-facing aura. Defensive counterpart to Nullification Orb.\n\nWould be good to also have this give you armor as well, not just allies. If that is accomplished via the ally_aura_armor and a separate armor listing for the champ that is fine",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Withering Aura",
+      "category": "equipment",
+      "type_affinity": "Occult",
+      "rarity": "rare",
+      "slot_type": "equipment",
+      "description": "Enemies within 2 tiles deal 3 less attack damage.",
+      "rules": {
+        "combat_effects": {
+          "enemy_aura_attack": -3,
+          "aura_range": 2
+        }
+      },
+      "id": "draft_30ec164c",
+      "status": "accepted",
+      "notes": "🟡 New enemy-debuff aura (softer than full silence). Positional denial.",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Blade of Dromoz",
+      "category": "weapon",
+      "type_affinity": "Fury",
+      "rarity": "rare",
+      "slot_type": "weapon",
+      "description": "+3 attack damage. Heal for 30% of basic-attack damage dealt.",
+      "rules": {
+        "stat_modifiers": {
+          "attack_damage": 3
+        },
+        "combat_effects": {
+          "lifesteal": 0.3
+        }
+      },
+      "id": "draft_08703a48",
+      "status": "accepted",
+      "notes": "🟡 Heal-on-basic-attack in try_attack. Combos with Scales of Power (steal power AND heal off it).",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Stoneform",
+      "category": "passive",
+      "rarity": "common",
+      "slot_type": "passive",
+      "tier": 1,
+      "key": "card_stoneform",
+      "upgrades_to": "card_stoneform_2",
+      "description": "Immune to Bleed.",
+      "rules": {
+        "combat_effects": {
+          "status_immunity": [
+            "bleed"
+          ]
+        }
+      },
+      "id": "draft_aa691bdf",
+      "status": "accepted",
+      "notes": "🟢 Free — immunity list already supports subsets. A common-rarity anti-DoT chain.",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Stoneform II",
+      "category": "passive",
+      "rarity": "uncommon",
+      "slot_type": "passive",
+      "tier": 2,
+      "key": "card_stoneform_2",
+      "upgrades_to": "card_stoneform_3",
+      "description": "Immune to Bleed and Poison.",
+      "rules": {
+        "combat_effects": {
+          "status_immunity": [
+            "bleed",
+            "poison"
+          ]
+        }
+      },
+      "id": "draft_4bf53ab9",
+      "status": "accepted",
+      "notes": "",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Stoneform III",
+      "category": "passive",
+      "rarity": "rare",
+      "slot_type": "passive",
+      "tier": 3,
+      "key": "card_stoneform_3",
+      "description": "Immune to Bleed, Poison, and Burn.",
+      "rules": {
+        "combat_effects": {
+          "status_immunity": [
+            "bleed",
+            "poison",
+            "burn"
+          ]
+        }
+      },
+      "id": "draft_77ae4778",
+      "status": "accepted",
+      "notes": "",
+      "origin": "brainstorm",
+      "promoted": true
+    },
+    {
+      "name": "Fellborn Blade",
+      "category": "weapon",
+      "rarity": "rare",
+      "slot_type": "weapon",
+      "description": "+6 basic-attack damage against targets with more max health than you.",
+      "rules": {
+        "combat_effects": {
+          "bonus_vs_higher_max_health": 6
+        }
+      },
+      "id": "draft_60a6f751",
+      "status": "accepted",
+      "notes": "🟡 try_attack bonus when target max_health > wielder. A health-based 'punch up' (vs Scales' attack-power axis).",
+      "origin": "brainstorm",
+      "type_affinity": null,
+      "promoted": true
+    },
+    {
+      "name": "Frenzy",
+      "category": "passive",
+      "type_affinity": "Fury",
+      "rarity": "uncommon",
+      "slot_type": "passive",
+      "description": "Gain +1 attack damage each time you attack (max +10).",
+      "rules": {
+        "combat_effects": {
+          "attack_gain_per_attack": 1,
+          "attack_gain_cap": 10
+        }
+      },
+      "id": "draft_a440fd2c",
+      "status": "accepted",
+      "notes": "🟡 Stacking attack in try_attack, capped. Rewards long fights + sustain builds.",
+      "origin": "brainstorm",
+      "promoted": true
+    }
+  ]
+}

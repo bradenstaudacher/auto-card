@@ -25,6 +25,24 @@ export const TYPE_GLYPH = {
   Death: '☠',  // skull
 }
 
+// Per-monster glyphs so enemies read as distinct silhouettes at a glance,
+// rather than all sharing their type glyph. Falls back to the type glyph.
+export const MONSTER_GLYPH = {
+  'Lesser Imp': '👺',
+  'Ash Hound': '🐺',
+  'Bone Wretch': '💀',
+  'Oathbound Guard': '🛡',
+  'Pale Acolyte': '🕯',
+  'Rift Brute': '👹',
+}
+
+// Status-effect visual cues: a badge glyph + color for the on-token indicator.
+export const STATUS_META = {
+  bleed: { glyph: '🩸', color: '#e5484d' },
+  poison: { glyph: '☠', color: '#5bd15b' },
+  burn: { glyph: '🔥', color: '#ff8a3d' },
+}
+
 export function typeColor(type) {
   return TYPE_COLORS[type] || '#666'
 }

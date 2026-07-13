@@ -5,12 +5,15 @@ module Combat
   class Unit
     STAT_KEYS = %i[
       health attack_damage magic_power armor shield
-      mana_cap mana_regen movement_speed attack_range attack_speed
+      mana_cap mana_regen movement_speed attack_range attack_speed health_regen
     ].freeze
 
-    attr_reader :id, :team, :name, :type, :subclass, :stats, :abilities, :ability_params, :on_hit, :modifiers
+    attr_reader :id, :team, :name, :type, :subclass, :stats, :abilities, :ability_params, :on_hit, :modifiers, :start_effects, :immunities, :silence_aura, :scales_to_target,
+                :lifesteal, :bonus_vs_higher_max_health, :attack_gain_per_attack, :attack_gain_cap, :auras,
+                :dot_bonus_damage, :dot_bonus_duration
+    attr_accessor :attack_gained
     attr_accessor :x, :y, :current_health, :mana,
-                  :attack_cooldown, :ability_cooldowns, :move_progress, :statuses
+                  :attack_cooldown, :ability_cooldowns, :move_progress, :statuses, :heal_progress
 
     def initialize(spec)
       @id       = spec.fetch(:id)
@@ -36,16 +39,43 @@ module Combat
       @attack_cooldown  = 0     # ticks until next basic attack allowed
       @ability_cooldowns = Hash.new(0)
       @move_progress    = 0.0   # accumulates movement_speed * tick_seconds
+      @heal_progress    = 0.0   # accumulates health_regen * tick_seconds; whole HP applied
       # On-hit status appliers from equipped weapons, e.g.
       #   { "type" => "bleed", "chance" => 0.15, "damage" => 4, "duration" => 3 }
       @on_hit    = (spec[:on_hit] || []).map { |e| e.transform_keys(&:to_s) }
       @statuses  = []           # active damage-over-time effects
       # Roster-modifier combat effects, e.g. { "on_kill_mana" => 1 }.
       @modifiers = (spec[:modifiers] || {}).transform_keys(&:to_s)
+      # One-time battle-start passives, e.g. { "adjacent_ally_shield" => 3 }.
+      # Applied by the simulator before the first tick.
+      @start_effects = (spec[:start_effects] || {}).transform_keys(&:to_s)
+      # Status kinds this unit can never receive, e.g. ["burn","bleed"].
+      @immunities = Array(spec[:immunities]).map(&:to_s)
+      # Silence-aura radius (tiles): living enemies within this range cannot cast.
+      @silence_aura = (spec[:silence_aura] || 0).to_i
+      # Scales of Power: basic attacks borrow the target's attack_damage when it
+      # exceeds the wielder's, so a weak unit hits with a strong foe's power.
+      @scales_to_target = spec[:scales_to_target] ? true : false
+      # Basic-attack modifiers from weapons/passives.
+      @lifesteal = (spec[:lifesteal] || 0).to_f                       # heal fraction of dmg dealt
+      @bonus_vs_higher_max_health = (spec[:bonus_vs_higher_max_health] || 0).to_i
+      @attack_gain_per_attack = (spec[:attack_gain_per_attack] || 0).to_i # Frenzy ramp
+      @attack_gain_cap = (spec[:attack_gain_cap] || 0).to_i
+      @attack_gained = 0                                              # running Frenzy total
+      # Battle-start auras this unit projects, e.g.
+      #   { "stat" => "armor", "amount" => 3, "range" => 2, "target" => "ally" }
+      @auras = (spec[:auras] || []).map { |a| a.transform_keys(&:to_s) }
+      # Plaguebearer: extra DoT damage/duration for statuses THIS unit applies.
+      @dot_bonus_damage = (spec[:dot_bonus_damage] || 0).to_i
+      @dot_bonus_duration = (spec[:dot_bonus_duration] || 0).to_i
     end
 
     def alive?
       @current_health > 0
+    end
+
+    def immune?(kind)
+      @immunities.include?(kind.to_s)
     end
 
     def position

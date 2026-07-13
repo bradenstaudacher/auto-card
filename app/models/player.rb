@@ -8,6 +8,6 @@ class Player < ApplicationRecord
   validates :seat, inclusion: { in: [1, 2] }
 
   def tableau
-    player_cards.includes(:card_template)
+    player_cards.includes(:card_template).order(:position, :id)
   end
 end

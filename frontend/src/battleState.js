@@ -13,6 +13,7 @@ export function buildInitialUnits(run, round) {
     units[id] = {
       id, name: champ.name, type: champ.type, team: 'allies',
       x: pl.x, y: pl.y, maxHp: champ.base_stats.health,
+      manaCap: champ.base_stats.mana_cap || 0, manaRegen: champ.base_stats.mana_regen || 0,
     }
   })
 
@@ -20,6 +21,7 @@ export function buildInitialUnits(run, round) {
     units[u.id] = {
       id: u.id, name: u.name, type: u.type, team: 'monsters',
       x: u.position.x, y: u.position.y, maxHp: u.stats.health,
+      manaCap: u.stats.mana_cap || 0, manaRegen: u.stats.mana_regen || 0,
     }
   })
   return units
@@ -32,9 +34,20 @@ export function deriveState(initial, events, tick) {
 
   const floaters = []
   const casters = new Set()
+  const lastCast = {}   // unitId -> tick of its most recent cast (mana reset point)
+  const applied = {}    // unitId -> { kind -> tick applied }
+  const ticked = {}     // unitId -> { kind -> tick of most recent DoT tick }
 
   for (const e of events) {
     if (e.tick > tick) break
+    if (e.type === 'cast') lastCast[e.source_id] = e.tick
+    if (e.type === 'status_applied') {
+      ;(applied[e.unit_id] ||= {})[e.effect] = e.tick
+    } else if (e.type === 'status') {
+      ;(ticked[e.unit_id] ||= {})[e.effect] = e.tick
+    } else if (e.type === 'cleanse') {
+      applied[e.unit_id] = {}; ticked[e.unit_id] = {} // any heal clears all statuses
+    }
     switch (e.type) {
       case 'move': {
         const u = units[e.unit_id]
@@ -88,6 +101,26 @@ export function deriveState(initial, events, tick) {
       }
     }
   }
+
+  // Reconstruct mana (charges +manaRegen/tick from battle start, reset on cast)
+  // and active statuses (applied & still ticking, not cleansed) for each unit.
+  Object.values(units).forEach((u) => {
+    if (u.manaCap > 0 && u.manaRegen > 0) {
+      const since = tick - (lastCast[u.id] || 0)
+      u.mana = Math.max(0, Math.min(u.manaCap, u.manaRegen * since))
+    } else {
+      u.mana = 0
+    }
+    const active = []
+    const app = applied[u.id] || {}
+    const tk = ticked[u.id] || {}
+    Object.keys(app).forEach((kind) => {
+      // Active if applied this very tick, or it has ticked within the last tick.
+      if (app[kind] === tick || (tk[kind] != null && tick - tk[kind] <= 1)) active.push(kind)
+    })
+    u.statuses = active
+  })
+
   return { units, floaters, casters }
 }
 

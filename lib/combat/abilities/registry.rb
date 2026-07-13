@@ -8,7 +8,9 @@ module Combat
         "Cleave"         => Cleave.new,
         "Hex Bolt"       => HexBolt.new,
         "Holy Flare"     => HolyFlare.new,
-        "Shield Pulse"   => ShieldPulse.new
+        "Shield Pulse"   => ShieldPulse.new,
+        "Dawnbreak"      => Dawnbreak.new,
+        "Soul Crush"     => SoulCrush.new
       }.freeze
 
       module_function

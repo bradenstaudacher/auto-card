@@ -5,8 +5,10 @@ import Bench from './Bench'
 import PlacementGrid from './PlacementGrid'
 import Tableau from './Tableau'
 import CharacterModal from './CharacterModal'
+import BattleStage from './BattleStage'
 
-export default function PreparationScreen({ run, me, onUpdate, onAbandon }) {
+export default function PreparationScreen({ run, me, onUpdate, onAbandon, replayRound, onReplayComplete }) {
+  const battle = replayRound || null
   const isCoop = run.mode === 'two_player_coop'
   const player = me ? run.players.find((p) => p.id === me.player_id) : run.players[0]
   const round = run.current_round_data
@@ -107,6 +109,12 @@ export default function PreparationScreen({ run, me, onUpdate, onAbandon }) {
     catch (err) { setError((err.errors || [err.message]).join(' · ')) }
   }
 
+  async function reorderCards(orderedIds) {
+    setError(null)
+    try { onUpdate(await api.reorderCards(run.id, player.id, orderedIds)) }
+    catch (err) { setError((err.errors || [err.message]).join(' · ')) }
+  }
+
   async function lockIn() {
     setSubmitting(true)
     setError(null)
@@ -124,10 +132,10 @@ export default function PreparationScreen({ run, me, onUpdate, onAbandon }) {
   const modalChampion = modalPcId != null ? rosterById[modalPcId] : null
 
   return (
-    <div className="screen game-screen">
+    <div className={`screen game-screen${battle ? ' battle-mode' : ''}`}>
       <header className="topbar">
         <span className="round-pill">Round {run.current_round}/{run.max_rounds}{round.boss ? ' · BOSS' : ''}</span>
-        <span className="deploy-count">Deployed {iAmReady ? slots : placedCount}/{slots}</span>
+        <span className="deploy-count">{battle ? 'Battle' : `Deployed ${iAmReady ? slots : placedCount}/${slots}`}</span>
         {isCoop && <span className="coop-tag">CO-OP · Seat {player.seat}</span>}
         <button className="btn btn-ghost" onClick={onAbandon}>{isCoop ? 'Leave' : 'Abandon Run'}</button>
       </header>
@@ -142,29 +150,35 @@ export default function PreparationScreen({ run, me, onUpdate, onAbandon }) {
         />
 
         <main className="stage">
-          <PlacementGrid
-            enemies={enemies}
-            placements={iAmReady ? {} : placements}
-            lockedAllies={lockedAllies}
-            rosterById={rosterById}
-            onDrop={onDrop}
-            onDragStartPlaced={onDragStart}
-            onInspectPlaced={setModalPcId}
-            onUnplace={unplace}
-            onCardDrop={onChampionCardDrop}
-          />
-          {error && <p className="error-text">{error}</p>}
-          {iAmReady ? (
-            <p className="waiting-banner"><span className="pulse-dot" /> Locked in — waiting for your ally…</p>
+          {battle ? (
+            <BattleStage run={run} round={battle} onComplete={onReplayComplete} />
           ) : (
-            <button className="btn btn-primary btn-lg lockin" disabled={placedCount === 0 || submitting} onClick={lockIn}>
-              {submitting ? 'Resolving…' : 'Lock In & Fight'}
-            </button>
+            <>
+              <PlacementGrid
+                enemies={enemies}
+                placements={iAmReady ? {} : placements}
+                lockedAllies={lockedAllies}
+                rosterById={rosterById}
+                onDrop={onDrop}
+                onDragStartPlaced={onDragStart}
+                onInspectPlaced={setModalPcId}
+                onUnplace={unplace}
+                onCardDrop={onChampionCardDrop}
+              />
+              {error && <p className="error-text">{error}</p>}
+              {iAmReady ? (
+                <p className="waiting-banner"><span className="pulse-dot" /> Locked in — waiting for your ally…</p>
+              ) : (
+                <button className="btn btn-primary btn-lg lockin" disabled={placedCount === 0 || submitting} onClick={lockIn}>
+                  {submitting ? 'Resolving…' : 'Lock In & Fight'}
+                </button>
+              )}
+            </>
           )}
         </main>
       </div>
 
-      <Tableau cards={player.tableau} rosterById={rosterById} onDiscard={discard} />
+      <Tableau cards={player.tableau} rosterById={rosterById} onDiscard={discard} onReorder={reorderCards} />
 
       {modalChampion && (
         <CharacterModal
