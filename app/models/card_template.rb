@@ -1,5 +1,5 @@
 class CardTemplate < ApplicationRecord
-  CATEGORIES = %w[ability weapon equipment passive modifier].freeze
+  CATEGORIES = %w[ability weapon equipment passive modifier xp].freeze
   RARITIES = %w[common uncommon rare].freeze
 
   has_many :player_cards, dependent: :restrict_with_exception

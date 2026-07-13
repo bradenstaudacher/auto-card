@@ -23,6 +23,13 @@ export const api = {
   joinCoop: (roomCode, handle) =>
     request('/coop/join', { method: 'POST', body: { room_code: roomCode, handle } }),
   getRun: (id) => request(`/runs/${id}`),
+  selectChampions: (runId, championKeys) =>
+    request(`/runs/${runId}/select_champions`, { method: 'POST', body: { champion_keys: championKeys } }),
+  feedCard: (runId, playerCardId, playerCharacterId) =>
+    request(`/runs/${runId}/player_cards/${playerCardId}/feed`, {
+      method: 'POST',
+      body: { player_character_id: playerCharacterId },
+    }),
   submitPlacement: (runId, playerId, placements) =>
     request(`/runs/${runId}/placements`, {
       method: 'POST',

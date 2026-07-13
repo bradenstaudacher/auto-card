@@ -4,7 +4,7 @@ import { isCardDrag } from '../dnd'
 
 const STAT_ROWS = [
   ['health', 'Health'], ['attack_damage', 'Attack'], ['magic_power', 'Magic'],
-  ['armor', 'Armor'], ['shield', 'Shield'], ['mana_cap', 'Mana'],
+  ['armor', 'Armor'], ['resist', 'Resist'], ['mana_cap', 'Mana'],
   ['mana_regen', 'Mana Regen'], ['movement_speed', 'Move'],
   ['attack_range', 'Range'], ['attack_speed', 'Atk Speed'],
 ]

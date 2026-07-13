@@ -23,6 +23,19 @@ module Api
         render_run(session.reload)
       end
 
+      # POST /api/v1/runs/:run_id/player_cards/:id/feed  { player_character_id }
+      # Consumes an XP card, granting its XP to the target champion.
+      def feed
+        session = load_session
+        return preparation_error unless %w[preparation reward].include?(session.status)
+
+        card = scoped_cards(session).find(params[:id])
+        character = scoped_characters(session).find(params.require(:player_character_id))
+        result = ExperienceFeed.consume(card, character)
+
+        result.ok? ? render_run(session.reload) : render_errors(result.errors)
+      end
+
       # DELETE /api/v1/runs/:run_id/player_cards/:id
       # Permanently discards a card from the tableau (unequipping it first).
       def destroy

@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       end
 
       resources :runs, only: %i[create show] do
+        member { post :select_champions }
         resources :placements, only: %i[create]
         resources :rewards, only: [] do
           post :select, on: :member
@@ -26,6 +27,7 @@ Rails.application.routes.draw do
           member do
             post :assign
             post :unassign
+            post :feed
           end
           patch :reorder, on: :collection
         end

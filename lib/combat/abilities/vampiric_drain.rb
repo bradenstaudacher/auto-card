@@ -19,14 +19,14 @@ module Combat
 
         caster.mana -= mana_cost
 
-        raw = target.current_health * 0.25
+        pct = caster.ability_params.dig(name, "drain_pct") || 0.25
+        min = caster.ability_params.dig(name, "min") || MIN_DAMAGE
+        max = caster.ability_params.dig(name, "max") || MAX_DAMAGE
+        raw = target.current_health * pct
         mitigated = Damage.magic(raw: raw, attacker: caster, defender: target)
-        damage = mitigated.clamp(MIN_DAMAGE, MAX_DAMAGE)
+        damage = mitigated.clamp(min, max)
 
-        target.current_health -= damage
-        target.current_health = 0 if target.current_health.negative?
-
-        healing = damage
+        healing = target.take_damage(damage) # heal for HP actually drained (past any barrier)
         missing = caster.stats[:health] - caster.current_health
         applied_heal = [healing, missing].min
         caster.current_health += applied_heal
@@ -38,6 +38,7 @@ module Combat
           source_id: caster.id, target_id: target.id,
           damage: damage, healing: applied_heal,
           target_health_after: target.current_health,
+          target_shield_after: target.barrier,
           source_health_after: caster.current_health,
           damage_type: "magic"
         )]

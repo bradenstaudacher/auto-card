@@ -15,6 +15,20 @@ module Api
         render_run(find_session)
       end
 
+      # POST /api/v1/runs/:id/select_champions  { champion_keys: [key, key, key] }
+      def select_champions
+        session = find_session
+        player = session.players.first
+        result = RunOrchestrator.new(session).select_champions(
+          player: player, champion_keys: params[:champion_keys]
+        )
+        if result.ok?
+          render_run(session.reload, status: :ok)
+        else
+          render json: { errors: result.errors }, status: :unprocessable_entity
+        end
+      end
+
       private
 
       def find_session

@@ -10,6 +10,8 @@ cards:
     type_affinity: Death
     rarity: common
     slot_type: ability
+    tier: 1
+    upgrades_to: card_vampiric_drain_2
     description: Drain 25% of an enemy's current health (5-40), healing yourself for it.
     valid_types: []
     valid_subclasses: []
@@ -110,6 +112,7 @@ cards:
     rarity: common
     slot_type: ability
     tier: 1
+    upgrades_to: card_shield_pulse_2
     description: Heal the most-wounded nearby ally for 150% magic power.
     valid_types: []
     valid_subclasses: []
@@ -153,6 +156,8 @@ cards:
     type_affinity: null
     rarity: common
     slot_type: weapon
+    tier: 1
+    upgrades_to: card_oaken_staff_2
     description: "+3 magic power, +1 attack range."
     valid_types: []
     valid_subclasses: []
@@ -166,6 +171,8 @@ cards:
     type_affinity: null
     rarity: common
     slot_type: equipment
+    tier: 1
+    upgrades_to: card_iron_plating_2
     description: "+3 armor, +15 health."
     valid_types: []
     valid_subclasses: []
@@ -178,11 +185,13 @@ cards:
     type_affinity: null
     rarity: uncommon
     slot_type: equipment
-    description: "+4 shield."
+    tier: 1
+    upgrades_to: card_warding_charm_2
+    description: "+4 magic resist."
     valid_types: []
     valid_subclasses: []
     rules:
-      stat_modifiers: { shield: 4 }
+      stat_modifiers: { resist: 4 }
 
   # --- Passives ---
   - key: card_battle_rhythm
@@ -191,6 +200,8 @@ cards:
     type_affinity: null
     rarity: common
     slot_type: passive
+    tier: 1
+    upgrades_to: card_battle_rhythm_2
     description: "+1 mana regen."
     valid_types: []
     valid_subclasses: []
@@ -243,14 +254,14 @@ cards:
     type_affinity:
     rarity: uncommon
     slot_type: equipment
-    description: "+6 shield, +2 armor."
+    description: "+6 magic resist, +2 armor."
     valid_types: []
     valid_subclasses: []
     tier: 1
     upgrades_to: card_giant_shield_2
     rules:
       stat_modifiers:
-        shield: 6
+        resist: 6
         armor: 2
   - key: card_magicians_charm
     name: Magicians Charm
@@ -258,6 +269,8 @@ cards:
     type_affinity:
     rarity: common
     slot_type: equipment
+    tier: 1
+    upgrades_to: card_magicians_charm_2
     description: "+2 magic power, +2 mana cap."
     valid_types: []
     valid_subclasses: []
@@ -271,6 +284,8 @@ cards:
     type_affinity:
     rarity: uncommon
     slot_type: passive
+    tier: 1
+    upgrades_to: card_second_wind_2
     description: "+20 health, +0.5 mana regen. Generic survivability passive."
     valid_types: []
     valid_subclasses: []
@@ -284,7 +299,7 @@ cards:
     type_affinity: Holy
     rarity: rare
     slot_type: passive
-    description: "+3 shield while adjacent to an ally at battle start."
+    description: "+3 absorb shield (grey) while adjacent to an ally at battle start."
     valid_types: []
     valid_subclasses: []
     tier: 1
@@ -298,6 +313,8 @@ cards:
     type_affinity: Holy
     rarity: rare
     slot_type: ability
+    tier: 1
+    upgrades_to: card_dawnbreak_2
     description: Sear the target and adjacent enemies for 130% magic power; ward allies
       next to you with shield (50% magic power).
     valid_types: []
@@ -326,14 +343,14 @@ cards:
     type_affinity:
     rarity: rare
     slot_type: equipment
-    description: "+10 shield, +3 armor."
+    description: "+10 magic resist, +3 armor."
     valid_types: []
     valid_subclasses: []
     tier: 2
     upgrades_to: card_giant_shield_3
     rules:
       stat_modifiers:
-        shield: 10
+        resist: 10
         armor: 3
   - key: card_giant_shield_3
     name: Giant Shield III
@@ -341,13 +358,13 @@ cards:
     type_affinity:
     rarity: rare
     slot_type: equipment
-    description: "+12 shield, +5 armor."
+    description: "+12 magic resist, +5 armor."
     valid_types: []
     valid_subclasses: []
     tier: 3
     rules:
       stat_modifiers:
-        shield: 12
+        resist: 12
         armor: 5
   - key: card_martyrs_vow_2
     name: Martyrs Vow II
@@ -355,7 +372,7 @@ cards:
     type_affinity: Holy
     rarity: rare
     slot_type: passive
-    description: "+5 shield while adjacent to an ally at battle start."
+    description: "+5 absorb shield (grey) while adjacent to an ally at battle start."
     valid_types: []
     valid_subclasses: []
     tier: 2
@@ -389,7 +406,7 @@ cards:
     slot_type: ability
     tier: 1
     upgrades_to: card_soul_crush_2
-    description: Deal true damage equal to 40% of magic power, ignoring armor and shield.
+    description: Deal true damage equal to 40% of magic power, ignoring armor, resist, and shields.
     valid_types: []
     valid_subclasses: []
     rules:
@@ -600,7 +617,7 @@ cards:
     type_affinity: Death
     rarity: uncommon
     slot_type: ability
-    description: Deal true damage equal to 55% of magic power, ignoring armor and shield.
+    description: Deal true damage equal to 55% of magic power, ignoring armor, resist, and shields.
     valid_types: []
     valid_subclasses: []
     tier: 2
@@ -615,7 +632,7 @@ cards:
     type_affinity: Death
     rarity: rare
     slot_type: ability
-    description: Deal true damage equal to 70% of magic power, ignoring armor and shield.
+    description: Deal true damage equal to 70% of magic power, ignoring armor, resist, and shields.
     valid_types: []
     valid_subclasses: []
     tier: 3
@@ -629,6 +646,8 @@ cards:
     type_affinity: Holy
     rarity: rare
     slot_type: equipment
+    tier: 1
+    upgrades_to: card_beacon_of_vigor_2
     description: Allies within 2 tiles gain +2 health regen/sec.
     valid_types: []
     valid_subclasses: []
@@ -642,6 +661,8 @@ cards:
     type_affinity: Law
     rarity: rare
     slot_type: equipment
+    tier: 1
+    upgrades_to: card_aegis_standard_2
     description: Allies within 2 tiles gain +3 armor.
     valid_types: []
     valid_subclasses: []
@@ -748,3 +769,561 @@ cards:
       combat_effects:
         attack_gain_per_attack: 1
         attack_gain_cap: 10
+
+  # --- XP cards (consumable) — drag onto a champion to grant experience.
+  # Not equipped; consumed on use. category "xp" with rules.xp_grant.
+  - key: card_tome_of_insight
+    name: Tome of Insight
+    category: xp
+    type_affinity: null
+    rarity: common
+    slot_type: consumable
+    description: "Consume to grant a champion +50 XP."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      xp_grant: 50
+  - key: card_codex_of_mastery
+    name: Codex of Mastery
+    category: xp
+    type_affinity: null
+    rarity: uncommon
+    slot_type: consumable
+    description: "Consume to grant a champion +120 XP."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      xp_grant: 120
+  - key: card_ascendant_grimoire
+    name: Ascendant Grimoire
+    category: xp
+    type_affinity: null
+    rarity: rare
+    slot_type: consumable
+    description: "Consume to grant a champion +300 XP."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      xp_grant: 300
+
+  # --- New abilities pass 2026-07-13 ---
+  # Upgrade tiers for existing abilities (reuse engine logic via ability_params).
+  - key: card_dawnbreak_2
+    name: Dawnbreak II
+    category: ability
+    type_affinity: Holy
+    rarity: rare
+    slot_type: ability
+    tier: 2
+    upgrades_to: card_dawnbreak_3
+    description: Sear the target and adjacent enemies for 150% magic power; ward allies
+      next to you with shield (60% magic power).
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Dawnbreak
+      ability_params:
+        power_scale: 1.5
+        shield_scale: 0.6
+  - key: card_dawnbreak_3
+    name: Dawnbreak III
+    category: ability
+    type_affinity: Holy
+    rarity: rare
+    slot_type: ability
+    tier: 3
+    description: Sear the target and adjacent enemies for 170% magic power; ward allies
+      next to you with shield (70% magic power).
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Dawnbreak
+      ability_params:
+        power_scale: 1.7
+        shield_scale: 0.7
+  - key: card_shield_pulse_2
+    name: Shield Pulse II
+    category: ability
+    type_affinity: Law
+    rarity: uncommon
+    slot_type: ability
+    tier: 2
+    description: Heal the most-wounded nearby ally for 200% magic power.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Shield Pulse
+      ability_params:
+        power_scale: 2.0
+  - key: card_vampiric_drain_2
+    name: Vampiric Drain II
+    category: ability
+    type_affinity: Death
+    rarity: uncommon
+    slot_type: ability
+    tier: 2
+    description: Drain 35% of an enemy's current health (8-60), healing yourself for it.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Vampiric Drain
+      ability_params:
+        drain_pct: 0.35
+        min: 8
+        max: 60
+
+  # New Law control ability: Jail (disarm — blocks basic attacks, not casts).
+  - key: card_jail
+    name: Jail
+    category: ability
+    type_affinity: Law
+    rarity: common
+    slot_type: ability
+    tier: 1
+    upgrades_to: card_jail_2
+    description: Jail an enemy — it cannot basic-attack for 1s (can still cast/move).
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Jail
+      ability_params:
+        duration_ticks: 4
+  - key: card_jail_2
+    name: Jail II
+    category: ability
+    type_affinity: Law
+    rarity: uncommon
+    slot_type: ability
+    tier: 2
+    upgrades_to: card_jail_3
+    description: Jail an enemy — it cannot basic-attack for 1.5s (can still cast/move).
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Jail
+      ability_params:
+        duration_ticks: 6
+  - key: card_jail_3
+    name: Jail III
+    category: ability
+    type_affinity: Law
+    rarity: rare
+    slot_type: ability
+    tier: 3
+    description: Jail an enemy — it cannot basic-attack for 2s (can still cast/move).
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Jail
+      ability_params:
+        duration_ticks: 8
+
+  # New generic (class-agnostic) abilities: Ward, Blitz, Sustain.
+  - key: card_ward
+    name: Ward
+    category: ability
+    type_affinity:
+    rarity: common
+    slot_type: ability
+    tier: 1
+    upgrades_to: card_ward_2
+    description: Absorb shield 20 to you and adjacent allies — soaks damage before
+      health (grey on the health bar).
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Ward
+      ability_params:
+        amount: 20
+  - key: card_ward_2
+    name: Ward II
+    category: ability
+    type_affinity:
+    rarity: uncommon
+    slot_type: ability
+    tier: 2
+    description: Absorb shield 40 to you and adjacent allies — soaks damage before
+      health (grey on the health bar).
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Ward
+      ability_params:
+        amount: 40
+  - key: card_blitz
+    name: Blitz
+    category: ability
+    type_affinity:
+    rarity: common
+    slot_type: ability
+    tier: 1
+    upgrades_to: card_blitz_2
+    description: Gain +25% attack speed for 3s.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Blitz
+      ability_params:
+        amount: 0.25
+        duration_ticks: 12
+  - key: card_blitz_2
+    name: Blitz II
+    category: ability
+    type_affinity:
+    rarity: uncommon
+    slot_type: ability
+    tier: 2
+    upgrades_to: card_blitz_3
+    description: Gain +40% attack speed for 3s.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Blitz
+      ability_params:
+        amount: 0.40
+        duration_ticks: 12
+  - key: card_blitz_3
+    name: Blitz III
+    category: ability
+    type_affinity:
+    rarity: rare
+    slot_type: ability
+    tier: 3
+    description: Gain +60% attack speed for 3s.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Blitz
+      ability_params:
+        amount: 0.60
+        duration_ticks: 12
+  - key: card_sustain
+    name: Sustain
+    category: ability
+    type_affinity:
+    rarity: common
+    slot_type: ability
+    tier: 1
+    upgrades_to: card_sustain_2
+    description: Gain +5 health regen/sec for 3s.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Sustain
+      ability_params:
+        amount: 5
+        duration_ticks: 12
+  - key: card_sustain_2
+    name: Sustain II
+    category: ability
+    type_affinity:
+    rarity: uncommon
+    slot_type: ability
+    tier: 2
+    upgrades_to: card_sustain_3
+    description: Gain +10 health regen/sec for 3s.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Sustain
+      ability_params:
+        amount: 10
+        duration_ticks: 12
+  - key: card_sustain_3
+    name: Sustain III
+    category: ability
+    type_affinity:
+    rarity: rare
+    slot_type: ability
+    tier: 3
+    description: Gain +15 health regen/sec for 3s.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      ability_name: Sustain
+      ability_params:
+        amount: 15
+        duration_ticks: 12
+
+  # --- Weapons pass 2026-07-13 ---
+  - key: card_oaken_staff_2
+    name: Oaken Staff II
+    category: weapon
+    type_affinity: null
+    rarity: uncommon
+    slot_type: weapon
+    tier: 2
+    upgrades_to: card_oaken_staff_3
+    description: "+5 magic power, +1 attack range."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { magic_power: 5, attack_range: 1 }
+  - key: card_oaken_staff_3
+    name: Oaken Staff III
+    category: weapon
+    type_affinity: null
+    rarity: rare
+    slot_type: weapon
+    tier: 3
+    description: "+6 magic power, +2 attack range."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { magic_power: 6, attack_range: 2 }
+  - key: card_dagger
+    name: Dagger
+    category: weapon
+    type_affinity: null
+    rarity: common
+    slot_type: weapon
+    description: "+2 attack damage, +20% attack speed."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { attack_damage: 2, attack_speed: 0.2 }
+  - key: card_gauntlet
+    name: Gauntlet
+    category: weapon
+    type_affinity: null
+    rarity: common
+    slot_type: weapon
+    description: "+3 attack damage, +3 armor."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { attack_damage: 3, armor: 3 }
+  - key: card_pike
+    name: Pike
+    category: weapon
+    type_affinity: null
+    rarity: common
+    slot_type: weapon
+    tier: 1
+    upgrades_to: card_pike_2
+    description: "+4 attack damage, +2 attack range."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { attack_damage: 4, attack_range: 2 }
+  - key: card_pike_2
+    name: Pike II
+    category: weapon
+    type_affinity: null
+    rarity: uncommon
+    slot_type: weapon
+    tier: 2
+    upgrades_to: card_pike_3
+    description: "+6 attack damage, +2 attack range."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { attack_damage: 6, attack_range: 2 }
+  - key: card_pike_3
+    name: Pike III
+    category: weapon
+    type_affinity: null
+    rarity: rare
+    slot_type: weapon
+    tier: 3
+    description: "+8 attack damage, +2 attack range."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { attack_damage: 8, attack_range: 2 }
+  - key: card_spirit_hammer
+    name: Spirit Hammer
+    category: weapon
+    type_affinity: null
+    rarity: common
+    slot_type: weapon
+    tier: 1
+    upgrades_to: card_spirit_hammer_2
+    description: "+4 attack damage, +2 mana regen."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { attack_damage: 4, mana_regen: 2 }
+  - key: card_spirit_hammer_2
+    name: Spirit Hammer II
+    category: weapon
+    type_affinity: null
+    rarity: uncommon
+    slot_type: weapon
+    tier: 2
+    upgrades_to: card_spirit_hammer_3
+    description: "+5 attack damage, +3 mana regen."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { attack_damage: 5, mana_regen: 3 }
+  - key: card_spirit_hammer_3
+    name: Spirit Hammer III
+    category: weapon
+    type_affinity: null
+    rarity: rare
+    slot_type: weapon
+    tier: 3
+    description: "+6 attack damage, +4 mana regen."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { attack_damage: 6, mana_regen: 4 }
+  - key: card_travols_sickle
+    name: Travol's Sickle
+    category: weapon
+    type_affinity: null
+    rarity: rare
+    slot_type: weapon
+    description: "+3 attack damage, Bleed 4."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { attack_damage: 3 }
+      combat_effects: { bleed: { chance: 0.6, damage: 10, duration: 3 } }
+
+  # --- Equipment tiers pass 2026-07-13 ---
+  - key: card_iron_plating_2
+    name: Iron Plating II
+    category: equipment
+    type_affinity: null
+    rarity: uncommon
+    slot_type: equipment
+    tier: 2
+    upgrades_to: card_iron_plating_3
+    description: "+5 armor, +25 health."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { armor: 5, health: 25 }
+  - key: card_iron_plating_3
+    name: Iron Plating III
+    category: equipment
+    type_affinity: null
+    rarity: rare
+    slot_type: equipment
+    tier: 3
+    description: "+7 armor, +40 health."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { armor: 7, health: 40 }
+  - key: card_warding_charm_2
+    name: Warding Charm II
+    category: equipment
+    type_affinity: null
+    rarity: rare
+    slot_type: equipment
+    tier: 2
+    upgrades_to: card_warding_charm_3
+    description: "+7 magic resist."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { resist: 7 }
+  - key: card_warding_charm_3
+    name: Warding Charm III
+    category: equipment
+    type_affinity: null
+    rarity: rare
+    slot_type: equipment
+    tier: 3
+    description: "+10 magic resist."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { resist: 10 }
+  - key: card_magicians_charm_2
+    name: Magicians Charm II
+    category: equipment
+    type_affinity: null
+    rarity: uncommon
+    slot_type: equipment
+    tier: 2
+    upgrades_to: card_magicians_charm_3
+    description: "+4 magic power, +3 mana cap."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { magic_power: 4, mana_cap: 3 }
+  - key: card_magicians_charm_3
+    name: Magicians Charm III
+    category: equipment
+    type_affinity: null
+    rarity: rare
+    slot_type: equipment
+    tier: 3
+    description: "+6 magic power, +4 mana cap."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { magic_power: 6, mana_cap: 4 }
+  - key: card_beacon_of_vigor_2
+    name: Beacon of Vigor II
+    category: equipment
+    type_affinity: Holy
+    rarity: rare
+    slot_type: equipment
+    tier: 2
+    description: Allies within 2 tiles gain +3 health regen/sec.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      combat_effects:
+        ally_aura_health_regen: 3
+        aura_range: 2
+  - key: card_aegis_standard_2
+    name: Aegis Standard II
+    category: equipment
+    type_affinity: Law
+    rarity: rare
+    slot_type: equipment
+    tier: 2
+    description: Allies within 2 tiles gain +5 armor.
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      combat_effects:
+        ally_aura_armor: 5
+        aura_range: 2
+
+  # --- Passive tiers pass 2026-07-13 ---
+  - key: card_battle_rhythm_2
+    name: Battle Rhythm II
+    category: passive
+    type_affinity: null
+    rarity: uncommon
+    slot_type: passive
+    tier: 2
+    upgrades_to: card_battle_rhythm_3
+    description: "+2 mana regen."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { mana_regen: 2 }
+  - key: card_battle_rhythm_3
+    name: Battle Rhythm III
+    category: passive
+    type_affinity: null
+    rarity: rare
+    slot_type: passive
+    tier: 3
+    description: "+3 mana regen."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers: { mana_regen: 3 }
+  - key: card_second_wind_2
+    name: Second Wind II
+    category: passive
+    type_affinity: null
+    rarity: rare
+    slot_type: passive
+    tier: 2
+    description: "+35 health, +1 mana regen. Generic survivability passive."
+    valid_types: []
+    valid_subclasses: []
+    rules:
+      stat_modifiers:
+        health: 35
+        mana_regen: 1

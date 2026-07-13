@@ -3,12 +3,12 @@ require "spec_helper"
 RSpec.describe Combat::Abilities::VampiricDrain do
   # Target type defaults to Law (neutral vs the Death caster) so tests isolate
   # the ability math from the type-advantage multiplier.
-  def build_state(caster_hp:, target_hp:, target_shield: 0, distance: 2, target_type: "Law")
+  def build_state(caster_hp:, target_hp:, target_resist: 0, distance: 2, target_type: "Law")
     caster = Combat::Unit.new(
       id: "caster", team: "allies", name: "Reaper", type: "Death",
       position: { x: 0, y: 0 },
       stats: { health: 100, attack_damage: 5, magic_power: 8, armor: 0,
-               shield: 0, mana_cap: 5, mana_regen: 1, movement_speed: 1,
+               resist: 0, mana_cap: 5, mana_regen: 1, movement_speed: 1,
                attack_range: 1, attack_speed: 1.0 }
     )
     caster.current_health = caster_hp
@@ -18,7 +18,7 @@ RSpec.describe Combat::Abilities::VampiricDrain do
       id: "target", team: "monsters", name: "Brute", type: target_type,
       position: { x: distance, y: 0 },
       stats: { health: 400, attack_damage: 5, magic_power: 0, armor: 0,
-               shield: target_shield, mana_cap: 5, mana_regen: 1,
+               resist: target_resist, mana_cap: 5, mana_regen: 1,
                movement_speed: 1, attack_range: 1, attack_speed: 1.0 }
     )
     target.current_health = target_hp

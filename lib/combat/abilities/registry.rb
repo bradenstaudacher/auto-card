@@ -10,7 +10,11 @@ module Combat
         "Holy Flare"     => HolyFlare.new,
         "Shield Pulse"   => ShieldPulse.new,
         "Dawnbreak"      => Dawnbreak.new,
-        "Soul Crush"     => SoulCrush.new
+        "Soul Crush"     => SoulCrush.new,
+        "Jail"           => Jail.new,
+        "Ward"           => Ward.new,
+        "Blitz"          => Blitz.new,
+        "Sustain"        => Sustain.new
       }.freeze
 
       module_function

@@ -3,6 +3,7 @@ import { api } from './api'
 import { subscribeToSession } from './cable'
 import StartScreen from './components/StartScreen'
 import LobbyScreen from './components/LobbyScreen'
+import ChampionSelectScreen from './components/ChampionSelectScreen'
 import PreparationScreen from './components/PreparationScreen'
 import RewardScreen from './components/RewardScreen'
 import CompletedScreen from './components/CompletedScreen'
@@ -81,6 +82,7 @@ export default function App() {
     if (loading) return <div className="app-loading">Loading…</div>
     if (!run) return <StartScreen onStart={startRun} onCreateCoop={createCoop} onJoinCoop={joinCoop} error={error} />
     if (run.status === 'lobby') return <LobbyScreen run={run} onAbandon={abandon} />
+    if (run.status === 'selection') return <ChampionSelectScreen run={run} onUpdate={update} onAbandon={abandon} />
     if (run.status === 'completed') return <CompletedScreen run={run} onRestart={abandon} />
 
     const round = run.current_round_data

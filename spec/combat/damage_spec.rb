@@ -1,12 +1,12 @@
 require "spec_helper"
 
 RSpec.describe Combat::Damage do
-  def unit(type:, armor: 0, shield: 0)
+  def unit(type:, armor: 0, resist: 0)
     Combat::Unit.new(
       id: "u", team: "t", name: "n", type: type,
       position: { x: 0, y: 0 },
       stats: { health: 100, attack_damage: 10, magic_power: 10,
-               armor: armor, shield: shield, mana_cap: 5, mana_regen: 1,
+               armor: armor, resist: resist, mana_cap: 5, mana_regen: 1,
                movement_speed: 1, attack_range: 1, attack_speed: 1.0 }
     )
   end
@@ -18,9 +18,9 @@ RSpec.describe Combat::Damage do
     expect(described_class.physical(raw: 3, attacker: atk, defender: dfn)).to eq(1)
   end
 
-  it "applies flat shield mitigation to magic" do
+  it "applies flat resist mitigation to magic" do
     atk = unit(type: "Occult")
-    dfn = unit(type: "Occult", shield: 6)
+    dfn = unit(type: "Occult", resist: 6)
     expect(described_class.magic(raw: 20, attacker: atk, defender: dfn)).to eq(14)
   end
 

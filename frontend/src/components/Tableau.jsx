@@ -13,12 +13,6 @@ const COMBINE_AT = 3
 export default function Tableau({ cards, rosterById, onDiscard, onReorder }) {
   const [dragOverId, setDragOverId] = useState(null)
 
-  // Count ALL copies per template (equipped or not) for the "2/3 → upgrades" hint.
-  const copyCounts = {}
-  cards.forEach((c) => {
-    copyCounts[c.card_template_id] = (copyCounts[c.card_template_id] || 0) + 1
-  })
-
   // Drop a dragged card onto another card here → move it before the target.
   function onReorderDrop(e, targetId) {
     if (!isCardDrag(e) || !onReorder) return
@@ -49,9 +43,12 @@ export default function Tableau({ cards, rosterById, onDiscard, onReorder }) {
           const rosterWide = c.slot_type === 'roster_modifier'
           const draggable = !rosterWide
           const tier = c.tier || 1
-          // Progress toward the next fusion (counts all copies, equipped or not).
-          const copies = copyCounts[c.card_template_id] || 0
-          const showProgress = c.upgrades && copies >= 2
+          // Upgrade path + fusion progress from the server (counts all copies,
+          // equipped or not). `copies` toward `combine_threshold` (default 3).
+          const canUpgrade = c.upgrades
+          const threshold = c.combine_threshold || COMBINE_AT
+          const copies = c.copies || 1
+          const nearly = copies >= threshold - 1
           return (
             <div
               key={c.id}
@@ -70,6 +67,9 @@ export default function Tableau({ cards, rosterById, onDiscard, onReorder }) {
               )}
               <div className="card-body">
                 <div className="card-name">
+                  {canUpgrade && (
+                    <span className="upgrade-badge" title={`Upgradeable — collect ${threshold} copies to fuse into the next tier`}>↑</span>
+                  )}
                   {c.name}
                   {tier > 1 && <span className="card-tier">{ROMAN[tier] || tier}</span>}
                 </div>
@@ -77,8 +77,13 @@ export default function Tableau({ cards, rosterById, onDiscard, onReorder }) {
                 <div className="card-desc">{c.description}</div>
                 {onChampion && <div className="card-tag">on {onChampion}</div>}
                 {rosterWide && <div className="card-tag">roster-wide</div>}
-                {showProgress && (
-                  <div className="combine-progress">{copies}/{COMBINE_AT} → upgrades</div>
+                {canUpgrade && (
+                  <div className={`combine-progress${nearly ? ' nearly' : ''}`}>
+                    <div className="combine-bar">
+                      <div className="combine-fill" style={{ width: `${Math.min(100, (copies / threshold) * 100)}%` }} />
+                    </div>
+                    <span className="combine-text">{copies}/{threshold}{nearly ? ' → upgrades!' : ' to upgrade'}</span>
+                  </div>
                 )}
               </div>
             </div>

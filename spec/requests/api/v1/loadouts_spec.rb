@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Api::V1 loadouts", type: :request do
   def json = JSON.parse(response.body)
 
-  let(:session) { RunOrchestrator.start_single_player(user: User.create!(handle: "loadout")) }
+  let(:session) { start_prepared_run(User.create!(handle: "loadout"), keys: %w[ember_vanguard violet_alchemist argent_truvate]) }
   let(:player) { session.players.first }
   let(:warrior) do
     player.player_characters.joins(:champion_template).find_by(champion_templates: { key: "ember_vanguard" })

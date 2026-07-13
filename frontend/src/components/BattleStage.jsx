@@ -76,9 +76,8 @@ export default function BattleStage({ run, round, onComplete }) {
               >
                 {casting && <span className="cast-burst" style={{ borderColor: typeColor(u.type) }} />}
                 <div
-                  className="unit-token"
-                  style={{ background: typeColor(u.type), color: typeText(u.type),
-                           outline: u.team === 'allies' ? '2px solid #6cf' : '2px solid #f86' }}
+                  className={`unit-token ${u.team === 'allies' ? 'team-ally' : 'team-enemy'}`}
+                  style={{ background: typeColor(u.type), color: typeText(u.type) }}
                   title={u.name}
                 >
                   <span className="champ-glyph">{glyph}</span>
@@ -99,11 +98,20 @@ export default function BattleStage({ run, round, onComplete }) {
                     ))}
                   </div>
                 )}
-                {u.alive && (
-                  <div className="hp-bar">
-                    <div className="hp-fill" style={{ width: `${Math.max(0, (u.hp / u.maxHp) * 100)}%` }} />
-                  </div>
-                )}
+                {u.alive && (() => {
+                  // Scale the bar so an absorb shield (grey) always shows, even at
+                  // full health: denominator grows to fit hp + shield when needed.
+                  const shield = u.shield || 0
+                  const denom = Math.max(u.maxHp, u.hp + shield)
+                  const hpPct = Math.max(0, (u.hp / denom) * 100)
+                  const shieldPct = Math.max(0, (shield / denom) * 100)
+                  return (
+                    <div className="hp-bar" title={shield > 0 ? `HP ${u.hp}/${u.maxHp} · Shield ${shield}` : `HP ${u.hp}/${u.maxHp}`}>
+                      <div className="hp-fill" style={{ width: `${hpPct}%` }} />
+                      {shield > 0 && <div className="hp-shield" style={{ width: `${shieldPct}%` }} />}
+                    </div>
+                  )
+                })()}
                 {floaters.filter((f) => f.unitId === u.id).map((f) => (
                   <span key={f.key} className={`floater ${f.kind}`}>{f.text}</span>
                 ))}

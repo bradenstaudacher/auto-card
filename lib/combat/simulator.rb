@@ -39,11 +39,11 @@ module Combat
 
     private
 
-    # One-time battle-start passives: a unit adjacent to any living ally gains
-    # the configured armor/shield (Lawful Formation, Martyr's Vow). Applied once
-    # before the first tick as a static stat buff — no timeline event, since it
-    # changes no health; its effect shows up in later mitigation and outcomes.
-    START_EFFECT_STATS = { "adjacent_ally_armor" => :armor, "adjacent_ally_shield" => :shield }.freeze
+    # One-time battle-start passives for a unit adjacent to any living ally.
+    # Lawful Formation adds a static armor stat (no event — shows up in later
+    # mitigation). Martyr's Vow grants a grey absorb barrier, which DOES emit a
+    # tick-0 event so the client can render the grey bar from the opening frame.
+    START_EFFECT_STATS = { "adjacent_ally_armor" => :armor }.freeze
 
     def apply_start_effects(state)
       state.units.each do |unit|
@@ -51,8 +51,15 @@ module Combat
         next unless state.allies_of(unit).any? { |a| a.alive? && Grid.manhattan(unit.position, a.position) == 1 }
 
         unit.start_effects.each do |kind, amount|
-          stat = START_EFFECT_STATS[kind]
-          unit.stats[stat] += amount if stat
+          if kind == "adjacent_ally_shield"
+            unit.add_barrier("Martyr's Vow", amount)
+            @events << { tick: state.tick, type: "cast", ability_name: "Martyr's Vow",
+                         source_id: unit.id, target_id: unit.id, damage: 0, healing: amount,
+                         target_health_after: unit.current_health,
+                         target_shield_after: unit.barrier, damage_type: "shield" }
+          elsif (stat = START_EFFECT_STATS[kind])
+            unit.stats[stat] += amount
+          end
         end
       end
     end
@@ -128,12 +135,12 @@ module Combat
         next if unit.statuses.empty?
         unit.statuses.each do |s|
           dmg = [s["damage"].to_i, 1].max
-          unit.current_health -= dmg
-          unit.current_health = 0 if unit.current_health.negative?
+          unit.take_damage(dmg)
           s["remaining"] -= 1
           @events << { tick: state.tick, type: "status", unit_id: unit.id,
                        effect: s["type"], damage: dmg,
-                       target_health_after: unit.current_health }
+                       target_health_after: unit.current_health,
+                       target_shield_after: unit.barrier }
           break unless unit.alive?
         end
         unit.statuses.reject! { |s| s["remaining"] <= 0 }
@@ -147,6 +154,8 @@ module Combat
     def regen_and_cooldowns(unit)
       unit.mana = [unit.mana + unit.stats[:mana_regen], unit.stats[:mana_cap]].min
       regenerate_health(unit)
+      Buffs.tick(unit) # expire timed stat buffs (Blitz/Sustain/Ward)
+      unit.disarmed_ticks -= 1 if unit.disarmed_ticks.positive? # Jail wears off
       unit.attack_cooldown -= 1 if unit.attack_cooldown.positive?
       unit.ability_cooldowns.each_key do |k|
         unit.ability_cooldowns[k] -= 1 if unit.ability_cooldowns[k].positive?
@@ -177,6 +186,7 @@ module Combat
     end
 
     def try_attack(unit, target, state)
+      return false if unit.disarmed? # Jailed: no basic attacks (abilities still fire)
       return false unless Grid.manhattan(unit.position, target.position) <= unit.stats[:attack_range]
       return false unless unit.attack_cooldown.zero?
 
@@ -186,15 +196,15 @@ module Combat
       raw += unit.bonus_vs_higher_max_health if unit.bonus_vs_higher_max_health.positive? &&
                                                  target.stats[:health] > unit.stats[:health]
       dmg = Damage.physical(raw: raw, attacker: unit, defender: target)
-      target.current_health -= dmg
-      target.current_health = 0 if target.current_health.negative?
+      target.take_damage(dmg)
       unit.attack_cooldown = unit.attack_cooldown_ticks(@tick_seconds)
       apply_lifesteal(unit, dmg)
       ramp_attack(unit) # Frenzy
 
       @events << { tick: state.tick, type: "attack", source_id: unit.id,
                    target_id: target.id, damage: dmg,
-                   target_health_after: target.current_health }
+                   target_health_after: target.current_health,
+                   target_shield_after: target.barrier }
       if target.alive?
         apply_on_hit(unit, target, state)
       else

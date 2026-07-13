@@ -4,7 +4,7 @@ RSpec.describe "new abilities" do
   def unit(id:, team:, type:, x:, y:, hp: 100, mp: 10, **over)
     Combat::Unit.new(
       id: id, team: team, name: id, type: type, position: { x: x, y: y },
-      stats: { health: hp, attack_damage: 5, magic_power: mp, armor: 0, shield: 0,
+      stats: { health: hp, attack_damage: 5, magic_power: mp, armor: 0, resist: 0,
                mana_cap: 5, mana_regen: 1, movement_speed: 0, attack_range: 1,
                attack_speed: 1.0 }.merge(over)
     )
@@ -57,7 +57,7 @@ RSpec.describe "new abilities" do
     expect(dmg_events.map { |ev| ev[:damage] }).to all(eq(13)) # 10 * 1.3, no shield
   end
 
-  it "Dawnbreak wards an adjacent ally with shield" do
+  it "Dawnbreak wards an adjacent ally with a grey absorb barrier" do
     caster = unit(id: "c", team: "allies", type: "Holy", x: 0, y: 0, mp: 10)
     caster.mana = 5
     ally = unit(id: "a", team: "allies", type: "Holy", x: 0, y: 1) # adjacent to caster
@@ -67,7 +67,8 @@ RSpec.describe "new abilities" do
       .resolve(caster: caster, state: st, tick: 1).map(&:to_h)
       .find { |ev| ev[:damage_type] == "shield" }
     expect(ward[:healing]).to eq(5)   # 10 * 0.5
-    expect(ally.stats[:shield]).to eq(5)
+    expect(ally.barrier).to eq(5)                 # grey absorb pool, not a stat
+    expect(ward[:target_shield_after]).to eq(5)   # client renders the grey bar
   end
 
   it "battle-start ward (Martyr's Vow) buffs a unit adjacent to an ally" do
@@ -82,7 +83,7 @@ RSpec.describe "new abilities" do
     # apply_start_effects only reads the passed state, so a bare simulator is fine.
     sim = Combat::Simulator.new({ seed: "t", grid: { rows: 6, columns: 8 }, units: [] })
     sim.send(:apply_start_effects, state([warded, ally, enemy]))
-    expect(warded.stats[:shield]).to eq(3)
+    expect(warded.barrier).to eq(3) # Martyr's Vow now grants a grey absorb barrier
   end
 
   it "health_regen restores HP per second without overhealing" do
@@ -132,15 +133,15 @@ RSpec.describe "new abilities" do
     expect(sim.send(:silenced?, far, state([orb, caster, far]))).to be(false)
   end
 
-  it "Soul Crush deals true damage ignoring armor and shield" do
+  it "Soul Crush deals true damage ignoring armor and resist" do
     caster = unit(id: "c", team: "allies", type: "Death", x: 0, y: 0, mp: 10)
     caster.mana = 5
-    tank = unit(id: "t", team: "monsters", type: "Death", x: 2, y: 0, hp: 100, armor: 50, shield: 50)
+    tank = unit(id: "t", team: "monsters", type: "Death", x: 2, y: 0, hp: 100, armor: 50, resist: 50)
     ev = Combat::Abilities::SoulCrush.new
       .resolve(caster: caster, state: state([caster, tank]), tick: 1).first.to_h
     expect(ev[:damage]).to eq(4)          # 10 * 0.4, mitigation ignored
     expect(ev[:damage_type]).to eq("true")
-    expect(tank.current_health).to eq(96) # 100 - 4, armor/shield did nothing
+    expect(tank.current_health).to eq(96) # 100 - 4, armor/resist did nothing
   end
 
   it "Scales of Power makes a weak attacker hit with a stronger target's power" do
@@ -227,5 +228,130 @@ RSpec.describe "new abilities" do
     s = target.statuses.find { |x| x["type"] == "poison" }
     expect(s["damage"]).to eq(5)     # 4 + 1
     expect(s["remaining"]).to eq(3)  # 2 + 1
+  end
+
+  it "Jail disarms an enemy, and a disarmed unit cannot basic-attack" do
+    caster = unit(id: "c", team: "allies", type: "Law", x: 0, y: 0, mp: 10)
+    caster.mana = 5
+    caster.instance_variable_set(:@ability_params, { "Jail" => { "duration_ticks" => 4 } })
+    enemy = unit(id: "e", team: "monsters", type: "Fury", x: 1, y: 0, hp: 100)
+    ev = Combat::Abilities::Jail.new.resolve(caster: caster, state: state([caster, enemy]), tick: 1).first.to_h
+    expect(ev[:effect]).to eq("disarm")
+    expect(enemy.disarmed_ticks).to eq(4)
+
+    # In melee range but jailed -> no basic attack lands.
+    sim = Combat::Simulator.new({ seed: "t", grid: { rows: 6, columns: 8 }, units: [] })
+    ally = unit(id: "a", team: "allies", type: "Fury", x: 2, y: 0, hp: 100) # enemy's target
+    expect(sim.send(:try_attack, enemy, ally, state([enemy, ally]))).to be(false)
+    expect(ally.current_health).to eq(100)
+  end
+
+  it "disarm wears off one tick at a time" do
+    u = unit(id: "u", team: "allies", type: "Law", x: 0, y: 0)
+    u.disarmed_ticks = 2
+    sim = Combat::Simulator.new({ seed: "t", grid: { rows: 6, columns: 8 }, units: [] })
+    sim.send(:regen_and_cooldowns, u)
+    expect(u.disarmed_ticks).to eq(1)
+    expect(u.disarmed?).to be(true)
+    sim.send(:regen_and_cooldowns, u)
+    expect(u.disarmed?).to be(false)
+  end
+
+  it "Ward grants an absorb barrier to the caster and adjacent allies but not distant ones" do
+    caster = unit(id: "c", team: "allies", type: "Law", x: 1, y: 0, mp: 10)
+    caster.mana = 5
+    caster.instance_variable_set(:@ability_params, { "Ward" => { "amount" => 20 } })
+    near = unit(id: "n", team: "allies", type: "Law", x: 1, y: 1) # adjacent
+    far  = unit(id: "f", team: "allies", type: "Law", x: 5, y: 0) # out of range
+    ev = Combat::Abilities::Ward.new.resolve(caster: caster, state: state([caster, near, far]), tick: 1)
+    expect(caster.barrier).to eq(20)
+    expect(near.barrier).to eq(20)
+    expect(far.barrier).to eq(0)
+    expect(ev.first.to_h[:target_shield_after]).to eq(20) # client renders the grey bar from this
+  end
+
+  it "Ward refreshes rather than stacks past its amount on recast" do
+    caster = unit(id: "c", team: "allies", type: "Law", x: 0, y: 0, mp: 10)
+    caster.mana = 5
+    caster.instance_variable_set(:@ability_params, { "Ward" => { "amount" => 20 } })
+    ward = Combat::Abilities::Ward.new
+    ward.resolve(caster: caster, state: state([caster]), tick: 1)
+    caster.take_damage(5) # barrier 20 -> 15
+    caster.mana = 5
+    ward.resolve(caster: caster, state: state([caster]), tick: 2) # tops back up to 20, not 35
+    expect(caster.barrier).to eq(20)
+  end
+
+  it "the absorb barrier soaks damage before health, then overflow hits health" do
+    u = unit(id: "u", team: "allies", type: "Fury", x: 0, y: 0, hp: 100)
+    u.add_barrier("test", 20)
+    hit = u.take_damage(12) # fully absorbed
+    expect(hit).to eq(0)
+    expect(u.barrier).to eq(8)
+    expect(u.current_health).to eq(100)
+    hit2 = u.take_damage(20) # 8 absorbed, 12 to health
+    expect(hit2).to eq(12)
+    expect(u.barrier).to eq(0)
+    expect(u.current_health).to eq(88)
+  end
+
+  it "barriers from different sources stack, but a source refreshes its own pool" do
+    u = unit(id: "u", team: "allies", type: "Law", x: 0, y: 0, hp: 100)
+    u.add_barrier("Ward", 20)
+    u.add_barrier("Dawnbreak", 6)
+    expect(u.barrier).to eq(26)          # different sources add together
+    u.take_damage(24)                    # eats all of Ward (20) + 4 of Dawnbreak
+    expect(u.barrier).to eq(2)
+    expect(u.current_health).to eq(100)
+    u.add_barrier("Ward", 20)            # same source tops its own pool back up
+    expect(u.barrier).to eq(22)          # 20 (Ward) + 2 (Dawnbreak remainder)
+  end
+
+  it "true damage bypasses the absorb barrier" do
+    u = unit(id: "u", team: "allies", type: "Fury", x: 0, y: 0, hp: 100)
+    u.add_barrier("Ward", 30)
+    hit = u.take_damage(10, bypass_barrier: true)
+    expect(hit).to eq(10)
+    expect(u.barrier).to eq(30)          # shield untouched
+    expect(u.current_health).to eq(90)   # damage went straight to health
+  end
+
+  it "Blitz buffs the caster's attack speed for a duration" do
+    caster = unit(id: "c", team: "allies", type: "Fury", x: 0, y: 0, mp: 10, attack_speed: 1.0)
+    caster.mana = 5
+    caster.instance_variable_set(:@ability_params, { "Blitz" => { "amount" => 0.4, "duration_ticks" => 2 } })
+    Combat::Abilities::Blitz.new.resolve(caster: caster, state: state([caster]), tick: 1)
+    expect(caster.stats[:attack_speed]).to eq(1.4)
+    Combat::Buffs.tick(caster); Combat::Buffs.tick(caster) # expire after 2 ticks
+    expect(caster.stats[:attack_speed]).to be_within(1e-9).of(1.0) # float revert
+  end
+
+  it "Sustain buffs the caster's health regen for a duration" do
+    caster = unit(id: "c", team: "allies", type: "Law", x: 0, y: 0, mp: 10, health_regen: 0)
+    caster.mana = 5
+    caster.instance_variable_set(:@ability_params, { "Sustain" => { "amount" => 10, "duration_ticks" => 3 } })
+    Combat::Abilities::Sustain.new.resolve(caster: caster, state: state([caster]), tick: 1)
+    expect(caster.stats[:health_regen]).to eq(10)
+  end
+
+  it "buffs refresh rather than stack on recast" do
+    u = unit(id: "u", team: "allies", type: "Fury", x: 0, y: 0, attack_speed: 1.0)
+    Combat::Buffs.apply(u, name: "Blitz", stat: "attack_speed", amount: 0.25, duration: 2)
+    Combat::Buffs.apply(u, name: "Blitz", stat: "attack_speed", amount: 0.25, duration: 4)
+    expect(u.stats[:attack_speed]).to eq(1.25) # not 1.5 — single instance
+  end
+
+  it "Vampiric Drain II uses card params for percent and clamp" do
+    caster = unit(id: "c", team: "allies", type: "Death", x: 0, y: 0, mp: 10)
+    caster.mana = 5
+    caster.instance_variable_set(:@ability_params,
+      { "Vampiric Drain" => { "drain_pct" => 0.35, "min" => 8, "max" => 60 } })
+    caster.current_health = 50
+    caster.stats[:health] = 200 # room to heal the full drain without capping
+    target = unit(id: "t", team: "monsters", type: "Death", x: 1, y: 0, hp: 200)
+    ev = Combat::Abilities::VampiricDrain.new
+      .resolve(caster: caster, state: state([caster, target]), tick: 1).first.to_h
+    expect(ev[:damage]).to eq(60)  # 200 * 0.35 = 70, clamped to max 60
+    expect(caster.current_health).to eq(110) # healed for the drained 60
   end
 end

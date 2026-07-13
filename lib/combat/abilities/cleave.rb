@@ -26,13 +26,12 @@ module Combat
         events = []
         victims.sort_by(&:id).each do |victim|
           dmg = Damage.physical(raw: raw, attacker: caster, defender: victim)
-          victim.current_health -= dmg
-          victim.current_health = 0 if victim.current_health.negative?
+          victim.take_damage(dmg)
           events << TimelineEvent.new(
             tick: tick, type: "cast", ability_name: name,
             source_id: caster.id, target_id: victim.id,
             damage: dmg, target_health_after: victim.current_health,
-            damage_type: "physical"
+            target_shield_after: victim.barrier, damage_type: "physical"
           )
           events << TimelineEvent.new(tick: tick, type: "death", unit_id: victim.id) unless victim.alive?
         end

@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe CardCombiner do
-  let(:session) { RunOrchestrator.start_single_player(user: User.create!(handle: "c")) }
+  let(:session) { start_prepared_run(User.create!(handle: "c")) }
   let(:player) { session.players.first }
   let(:cleave) { CardTemplate.find_by(key: "card_cleave") }
 

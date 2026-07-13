@@ -3,20 +3,35 @@ require "rails_helper"
 RSpec.describe "Api::V1::Runs", type: :request do
   def json = JSON.parse(response.body)
 
+  # Start a run and complete champion selection over HTTP, returning the run.
+  def start_and_select(keys: %w[hollow_reaper ember_vanguard argent_truvate])
+    post "/api/v1/runs", as: :json
+    run_id = json["id"]
+    post "/api/v1/runs/#{run_id}/select_champions", params: { champion_keys: keys }, as: :json
+    json
+  end
+
   describe "POST /api/v1/runs" do
-    it "starts a run and returns full state" do
+    it "starts in champion selection and offers the champion pool" do
       post "/api/v1/runs", params: { handle: "req-tester" }, as: :json
       expect(response).to have_http_status(:created)
-      expect(json["status"]).to eq("preparation")
-      expect(json["players"].first["roster"].size).to eq(5)
-      expect(json["current_round_data"]["player_slots"]).to eq(1)
+      expect(json["status"]).to eq("selection")
+      expect(json["players"].first["roster"]).to eq([])
+      expect(json["available_champions"].size).to eq(5)
+    end
+
+    it "select_champions builds the roster and enters preparation" do
+      run = start_and_select
+      expect(response).to have_http_status(:ok)
+      expect(run["status"]).to eq("preparation")
+      expect(run["players"].first["roster"].size).to eq(3)
+      expect(run["current_round_data"]["player_slots"]).to eq(1)
     end
   end
 
   describe "the full single-player round over HTTP" do
     it "places, resolves server-side, and grants a reward" do
-      post "/api/v1/runs", as: :json
-      run = json
+      run = start_and_select
       run_id = run["id"]
       player = run["players"].first
       reaper = player["roster"].find { |c| c["champion_key"] == "hollow_reaper" }
@@ -44,8 +59,7 @@ RSpec.describe "Api::V1::Runs", type: :request do
 
   describe "placement validation" do
     it "returns 422 for an out-of-zone tile" do
-      post "/api/v1/runs", as: :json
-      run = json
+      run = start_and_select
       pc = run["players"].first["roster"].first
       post "/api/v1/runs/#{run['id']}/placements",
            params: { player_id: run["players"].first["id"],
@@ -65,7 +79,7 @@ RSpec.describe "Api::V1::Runs", type: :request do
     it "self-heals a stuck trio of duplicates when the tableau is viewed" do
       # Simulate a trio that formed without the reward-select combine firing
       # (e.g. legacy data). Fetching the run during preparation should fuse it.
-      session = RunOrchestrator.start_single_player(user: User.create!(handle: "heal"))
+      session = start_prepared_run(User.create!(handle: "heal"))
       player = session.players.first
       cleave = CardTemplate.find_by(key: "card_cleave")
       3.times { player.player_cards.create!(card_template: cleave) }

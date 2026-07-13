@@ -30,7 +30,7 @@ export function buildInitialUnits(run, round) {
 // Returns { units, floaters, casters } for a given tick.
 export function deriveState(initial, events, tick) {
   const units = {}
-  Object.values(initial).forEach((u) => { units[u.id] = { ...u, hp: u.maxHp, alive: true } })
+  Object.values(initial).forEach((u) => { units[u.id] = { ...u, hp: u.maxHp, shield: 0, alive: true } })
 
   const floaters = []
   const casters = new Set()
@@ -56,12 +56,18 @@ export function deriveState(initial, events, tick) {
       }
       case 'attack': {
         const t = units[e.target_id]
-        if (t) t.hp = e.target_health_after
+        if (t) {
+          t.hp = e.target_health_after
+          if (e.target_shield_after != null) t.shield = e.target_shield_after
+        }
         break
       }
       case 'cast': {
         const t = units[e.target_id]
-        if (t) t.hp = e.target_health_after
+        if (t) {
+          t.hp = e.target_health_after
+          if (e.target_shield_after != null) t.shield = e.target_shield_after
+        }
         if (e.source_health_after != null && units[e.source_id]) {
           units[e.source_id].hp = e.source_health_after
         }
@@ -69,7 +75,10 @@ export function deriveState(initial, events, tick) {
       }
       case 'status': {
         const u = units[e.unit_id]
-        if (u) u.hp = e.target_health_after
+        if (u) {
+          u.hp = e.target_health_after
+          if (e.target_shield_after != null) u.shield = e.target_shield_after
+        }
         break
       }
       case 'death': {
@@ -90,9 +99,11 @@ export function deriveState(initial, events, tick) {
         }
         if (e.healing > 0) {
           // Self-heal (e.g. Vampiric Drain) sets source_health_after; ally heals
-          // (e.g. Shield Pulse) land on the target instead.
+          // (e.g. Shield Pulse) land on the target instead. Ward grants an absorb
+          // shield rather than health — show it grey.
           const healed = e.source_health_after != null ? e.source_id : e.target_id
-          floaters.push({ key: `${e.tick}-${healed}-h`, unitId: healed, text: `+${e.healing}`, kind: 'heal' })
+          const kind = e.damage_type === 'shield' ? 'shield' : 'heal'
+          floaters.push({ key: `${e.tick}-${healed}-h`, unitId: healed, text: `+${e.healing}`, kind })
         }
       } else if (e.type === 'status') {
         floaters.push({ key: `${e.tick}-${e.unit_id}-s`, unitId: e.unit_id, text: `-${e.damage}`, kind: e.effect })
@@ -131,7 +142,8 @@ export function logLine(initial, e) {
     case 'attack': return `${name(e.source_id)} hits ${name(e.target_id)} for ${e.damage}`
     case 'cast': {
       if (e.damage === 0 && e.healing > 0) {
-        return `${name(e.source_id)} casts ${e.ability_name} on ${name(e.target_id)} (heals ${e.healing})`
+        const verb = e.damage_type === 'shield' ? 'shields' : 'heals'
+        return `${name(e.source_id)} casts ${e.ability_name} on ${name(e.target_id)} (${verb} ${e.healing})`
       }
       const heal = e.healing > 0 ? `, heals ${e.healing}` : ''
       return `${name(e.source_id)} casts ${e.ability_name} on ${name(e.target_id)} (${e.damage} dmg${heal})`

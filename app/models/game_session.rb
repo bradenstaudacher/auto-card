@@ -1,6 +1,6 @@
 class GameSession < ApplicationRecord
   MODES = %w[single_player two_player_coop].freeze
-  STATUSES = %w[lobby preparation battle reward completed].freeze
+  STATUSES = %w[lobby selection preparation battle reward completed].freeze
 
   has_many :players, dependent: :destroy
   has_many :battle_rounds, dependent: :destroy

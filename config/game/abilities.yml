@@ -12,7 +12,7 @@ abilities:
     implemented: true
     description: >-
       Drains an enemy for 25% of its current health, healing the caster for the
-      damage dealt (after shield/type advantage), clamped to 5-40.
+      damage dealt (after resist/type advantage), clamped to 5-40.
 
   - name: Cleave
     type: Fury
@@ -87,7 +87,56 @@ abilities:
     implemented: true
     description: >-
       Deals true damage equal to 40% of the caster's magic power, ignoring
-      armor, shield, and type advantage. An anti-tank / anti-shield answer.
+      armor, resist, absorb shields, and type advantage. An anti-tank answer.
+
+  - name: Jail
+    type: Law
+    category: ability
+    damage_type: none
+    mana_cost: 4
+    targeting: enemy
+    range: 3
+    implemented: true
+    description: >-
+      Locks an enemy down so it cannot basic-attack for a short duration (it can
+      still cast and move). Duration scales with card tier (1s / 1.5s / 2s).
+
+  - name: Ward
+    type: null
+    category: ability
+    damage_type: shield
+    mana_cost: 4
+    targeting: self
+    range: 0
+    implemented: true
+    description: >-
+      Grants an absorb-shield barrier (extra HP that soaks damage before health,
+      shown grey on the health bar) to the caster and every adjacent ally.
+      Class-agnostic protection.
+
+  - name: Blitz
+    type: null
+    category: ability
+    damage_type: buff
+    mana_cost: 3
+    targeting: self
+    range: 0
+    implemented: true
+    description: >-
+      Self-buff: raises the caster's attack speed for a few seconds. Refreshes
+      rather than stacks on recast. Class-agnostic.
+
+  - name: Sustain
+    type: null
+    category: ability
+    damage_type: buff
+    mana_cost: 3
+    targeting: self
+    range: 0
+    implemented: true
+    description: >-
+      Self-buff: raises the caster's health regen for a few seconds. Refreshes
+      rather than stacks on recast. Class-agnostic.
 
   - name: Fury Strike
     type: Fury

@@ -7,18 +7,44 @@ class RunOrchestrator
   end
 
   # --- Entry point -----------------------------------------------------------
+  CHAMPIONS_PER_RUN = 3
+
   def self.start_single_player(user:)
     session = GameSession.create!(
       mode: "single_player",
-      status: "preparation",
+      status: "selection", # pick CHAMPIONS_PER_RUN champions before preparation
       current_round: 1,
       max_rounds: 10,
       seed: SecureRandom.hex(8)
     )
-    player = session.players.create!(user: user, seat: 1)
-    build_roster(player)
-    new(session).ensure_current_round!
+    session.players.create!(user: user, seat: 1)
     session
+  end
+
+  # Roster draft: create the chosen champions, then enter preparation. Validates
+  # the count and that each key is a real, distinct champion template.
+  def select_champions(player:, champion_keys:)
+    return Result.new(false, ["selection already made"], nil) unless @session.status == "selection"
+
+    keys = Array(champion_keys).uniq
+    unless keys.size == CHAMPIONS_PER_RUN
+      return Result.new(false, ["choose exactly #{CHAMPIONS_PER_RUN} champions"], nil)
+    end
+
+    templates = ChampionTemplate.where(key: keys)
+    return Result.new(false, ["unknown champion in selection"], nil) unless templates.count == keys.size
+
+    templates.each_with_index do |tpl, i|
+      player.player_characters.create!(
+        champion_template: tpl,
+        current_stats: tpl.base_stats,
+        ability_priority: Array(tpl.default_abilities),
+        bench_position: i
+      )
+    end
+    @session.update!(status: "preparation")
+    ensure_current_round!
+    Result.new(true, [], @session)
   end
 
   # --- Co-op --------------------------------------------------------------
@@ -125,6 +151,7 @@ class RunOrchestrator
     round = @session.current_battle_round
     @session.update!(status: "battle")
     BattleRunner.run!(round)
+    ExperienceAward.grant!(round)
     @session.players.each { |p| RewardRoller.offer_for(p, round) }
     # Boss round grants no rewards -> nothing to select, advance straight on.
     advance! if no_rewards_pending?(round)

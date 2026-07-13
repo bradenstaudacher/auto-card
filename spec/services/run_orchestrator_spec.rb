@@ -11,18 +11,37 @@ RSpec.describe RunOrchestrator do
   end
 
   describe ".start_single_player" do
-    it "creates a session with a full 5-champion roster in preparation" do
+    it "starts in champion selection with no roster yet" do
       session = described_class.start_single_player(user: user)
-      expect(session.status).to eq("preparation")
+      expect(session.status).to eq("selection")
       expect(session.current_round).to eq(1)
-      expect(session.players.first.player_characters.count).to eq(5)
+      expect(session.players.first.player_characters.count).to eq(0)
+    end
+
+    it "select_champions creates the chosen roster and enters preparation" do
+      session = described_class.start_single_player(user: user)
+      result = described_class.new(session).select_champions(
+        player: session.players.first, champion_keys: %w[ember_vanguard hollow_reaper argent_truvate]
+      )
+      expect(result).to be_ok
+      expect(session.reload.status).to eq("preparation")
+      expect(session.players.first.player_characters.count).to eq(3)
       expect(session.current_battle_round.encounter_data["monsters"]).to eq(%w[lesser_imp lesser_imp])
+    end
+
+    it "rejects a selection that isn't exactly three champions" do
+      session = described_class.start_single_player(user: user)
+      result = described_class.new(session).select_champions(
+        player: session.players.first, champion_keys: %w[ember_vanguard hollow_reaper]
+      )
+      expect(result).not_to be_ok
+      expect(result.errors.first).to match(/exactly 3/)
     end
   end
 
   describe "the round loop" do
     it "resolves a battle, offers rewards, and advances on selection" do
-      session = described_class.start_single_player(user: user)
+      session = start_prepared_run(user)
       player = session.players.first
       orch = described_class.new(session)
 
@@ -46,7 +65,7 @@ RSpec.describe RunOrchestrator do
     end
 
     it "re-simulates a resolved round to a byte-identical timeline (determinism through the stack)" do
-      session = described_class.start_single_player(user: user)
+      session = start_prepared_run(user)
       player = session.players.first
       place(described_class.new(session), player, "ember_vanguard", 1, 5)
 
@@ -62,7 +81,7 @@ RSpec.describe RunOrchestrator do
 
   describe "validation" do
     it "rejects placing more champions than the round allows" do
-      session = described_class.start_single_player(user: user)
+      session = start_prepared_run(user)
       player = session.players.first
       pcs = player.player_characters.limit(2).to_a
       result = described_class.new(session).submit_placement(

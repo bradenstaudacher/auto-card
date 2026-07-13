@@ -20,8 +20,20 @@ class RunSerializer
       max_rounds: @session.max_rounds,
       players: @session.players.order(:seat).map { |p| player_json(p) },
       current_round_data: round_json(@session.current_battle_round),
-      reward_offers: reward_offers_json
+      reward_offers: reward_offers_json,
+      available_champions: @session.status == "selection" ? available_champions_json : nil
     }
+  end
+
+  # The full champion pool offered at run start (status "selection").
+  def available_champions_json
+    ChampionTemplate.order(:key).map do |t|
+      {
+        key: t.key, name: t.name, type: t.type_key, subclass: t.subclass,
+        color: t.color, role: t.role, base_stats: t.base_stats,
+        slot_config: t.slot_config, default_abilities: t.default_abilities,
+      }
+    end
   end
 
   private
@@ -34,8 +46,16 @@ class RunSerializer
       ready: player.ready,
       roster: player.player_characters.includes(:champion_template, player_cards: :card_template)
                     .order(:bench_position).map { |pc| character_json(pc) },
-      tableau: player.tableau.map { |pc| player_card_json(pc) }
+      tableau: tableau_json(player)
     }
+  end
+
+  # Tableau cards, each annotated with how many copies of that template the
+  # player owns (equipped + unequipped) so the UI can show combine progress
+  # toward the 3-copy upgrade.
+  def tableau_json(player)
+    owned_counts = player.player_cards.group(:card_template_id).count
+    player.tableau.map { |pc| player_card_json(pc, owned_counts[pc.card_template_id] || 1) }
   end
 
   def character_json(pc)
@@ -50,7 +70,10 @@ class RunSerializer
       role: t.role,
       base_stats: t.base_stats,
       effective_stats: effective_stats(pc),
-      slot_config: t.slot_config,
+      slot_config: pc.slot_config,
+      level: pc.level,
+      xp: pc.xp,
+      xp_progress: pc.xp_progress,
       default_abilities: t.default_abilities,
       ability_priority: pc.ability_priority,
       abilities: abilities_json(pc),
@@ -82,7 +105,7 @@ class RunSerializer
 
   # Base stats + equipped stat_modifiers, so the modal reflects real combat stats.
   def effective_stats(pc)
-    stats = pc.champion_template.base_stats.dup
+    stats = pc.leveled_base_stats
     pc.player_cards.each do |c|
       (c.card_template.rules["stat_modifiers"] || {}).each do |k, delta|
         stats[k] = (stats[k] || 0) + delta
@@ -107,8 +130,11 @@ class RunSerializer
     }
   end
 
-  def player_card_json(pc)
+  COMBINE_THRESHOLD = CardCombiner::THRESHOLD
+
+  def player_card_json(pc, copies = 1)
     t = pc.card_template
+    upgrades = t.upgrades_to_key.present?
     {
       id: pc.id,
       card_template_id: t.id,
@@ -119,7 +145,10 @@ class RunSerializer
       type_affinity: t.type_affinity,
       valid_types: t.valid_types,
       tier: t.tier,
-      upgrades: t.upgrades_to_key.present?,
+      upgrades: upgrades,
+      # Combine progress toward the next tier (only when an upgrade path exists).
+      copies: copies,
+      combine_threshold: upgrades ? COMBINE_THRESHOLD : nil,
       description: t.description,
       assigned_to_player_character_id: pc.assigned_to_player_character_id,
       assigned_slot_index: pc.assigned_slot_index

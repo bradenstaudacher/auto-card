@@ -13,7 +13,7 @@ monsters:
       attack_damage: 7
       magic_power: 2
       armor: 1
-      shield: 2
+      resist: 2
       mana_cap: 4
       mana_regen: 0.5
       movement_speed: 3
@@ -33,7 +33,7 @@ monsters:
       attack_damage: 9
       magic_power: 0
       armor: 2
-      shield: 1
+      resist: 1
       mana_cap: 4
       mana_regen: 0.5
       movement_speed: 4
@@ -52,7 +52,7 @@ monsters:
       attack_damage: 11
       magic_power: 3
       armor: 0
-      shield: 1
+      resist: 1
       mana_cap: 4
       mana_regen: 0.5
       movement_speed: 3
@@ -70,7 +70,7 @@ monsters:
       attack_damage: 8
       magic_power: 2
       armor: 8
-      shield: 4
+      resist: 4
       mana_cap: 5
       mana_regen: 0.5
       movement_speed: 2
@@ -89,7 +89,7 @@ monsters:
       attack_damage: 5
       magic_power: 12
       armor: 2
-      shield: 5
+      resist: 5
       mana_cap: 8
       mana_regen: 1.25
       movement_speed: 2
@@ -110,7 +110,7 @@ monsters:
       attack_damage: 16
       magic_power: 6
       armor: 6
-      shield: 6
+      resist: 6
       mana_cap: 6
       mana_regen: 1
       movement_speed: 2

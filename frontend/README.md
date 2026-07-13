@@ -1,3 +1,22 @@
+# Frontend
+
+## Running the dev server
+
+Requires **Node 20.19+** (Vite 7's dev server uses `crypto.hash`; Node 18 will
+crash). The version is pinned in `.nvmrc`, so:
+
+```bash
+cd frontend
+nvm use          # reads .nvmrc -> Node 22, no version to remember
+npm install      # first time only
+npm run dev      # http://localhost:5173  (use localhost, not 127.0.0.1)
+```
+
+The dev server proxies `/api` and `/cable` to Rails on :3000, so start the
+backend (`bin/rails server -p 3000`) too.
+
+---
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.

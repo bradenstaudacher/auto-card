@@ -43,7 +43,7 @@ class ChampionUnitSpec
   private
 
   def stats
-    base = symbolize(@template.base_stats.dup)
+    base = symbolize(@pc.leveled_base_stats)
     equipped_cards.each do |card|
       (card.card_template.rules["stat_modifiers"] || {}).each do |stat, delta|
         key = stat.to_sym

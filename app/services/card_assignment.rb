@@ -75,7 +75,7 @@ class CardAssignment
       return errors
     end
 
-    capacity = character.champion_template.slot_count(config_key)
+    capacity = character.slot_count(config_key)
     used = character.player_cards.where.not(id: card.id)
                     .joins(:card_template).where(card_templates: { slot_type: t.slot_type }).count
     errors << "no open #{t.slot_type} slot on #{character.champion_template.name}" if used >= capacity

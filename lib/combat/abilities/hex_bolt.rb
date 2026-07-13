@@ -15,13 +15,13 @@ module Combat
         scale = caster.ability_params.dig(name, "power_scale") || 1.6
         raw = (caster.stats[:magic_power] * scale).round
         dmg = Damage.magic(raw: raw, attacker: caster, defender: target)
-        target.current_health -= dmg
-        target.current_health = 0 if target.current_health.negative?
+        target.take_damage(dmg)
 
         events = [TimelineEvent.new(
           tick: tick, type: "cast", ability_name: name,
           source_id: caster.id, target_id: target.id,
-          damage: dmg, target_health_after: target.current_health, damage_type: "magic"
+          damage: dmg, target_health_after: target.current_health,
+          target_shield_after: target.barrier, damage_type: "magic"
         )]
         events << TimelineEvent.new(tick: tick, type: "death", unit_id: target.id) unless target.alive?
         events

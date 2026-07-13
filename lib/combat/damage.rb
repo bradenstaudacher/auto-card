@@ -1,9 +1,9 @@
 module Combat
   # Damage resolution: type advantage applied to raw damage, then flat
-  # mitigation (armor for physical, shield for magic), floored at 1.
+  # mitigation (armor for physical, resist for magic), floored at 1.
   #
   #   physical_taken = max(1, round(raw * type_mult) - armor)
-  #   magic_taken    = max(1, round(raw * type_mult) - shield)
+  #   magic_taken    = max(1, round(raw * type_mult) - resist)
   module Damage
     module_function
 
@@ -18,7 +18,7 @@ module Combat
     def magic(raw:, attacker:, defender:)
       mult = TypeChart.multiplier(attacker.type, defender.type)
       amplified = (raw * mult).round
-      [amplified - defender.stats[:shield], 1].max
+      [amplified - defender.stats[:resist], 1].max
     end
   end
 end

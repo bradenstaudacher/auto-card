@@ -4,7 +4,7 @@ module Combat
   # player champions, including both seats in co-op) vs "monsters".
   class Unit
     STAT_KEYS = %i[
-      health attack_damage magic_power armor shield
+      health attack_damage magic_power armor resist
       mana_cap mana_regen movement_speed attack_range attack_speed health_regen
     ].freeze
 
@@ -13,7 +13,8 @@ module Combat
                 :dot_bonus_damage, :dot_bonus_duration
     attr_accessor :attack_gained
     attr_accessor :x, :y, :current_health, :mana,
-                  :attack_cooldown, :ability_cooldowns, :move_progress, :statuses, :heal_progress
+                  :attack_cooldown, :ability_cooldowns, :move_progress, :statuses, :heal_progress,
+                  :buffs, :disarmed_ticks
 
     def initialize(spec)
       @id       = spec.fetch(:id)
@@ -44,6 +45,9 @@ module Combat
       #   { "type" => "bleed", "chance" => 0.15, "damage" => 4, "duration" => 3 }
       @on_hit    = (spec[:on_hit] || []).map { |e| e.transform_keys(&:to_s) }
       @statuses  = []           # active damage-over-time effects
+      @buffs     = []           # active timed stat buffs (Blitz/Sustain/Ward)
+      @disarmed_ticks = 0       # ticks remaining unable to basic-attack (Jail)
+      @barriers  = {}           # absorb-shield HP pools keyed by source; soak damage before health
       # Roster-modifier combat effects, e.g. { "on_kill_mana" => 1 }.
       @modifiers = (spec[:modifiers] || {}).transform_keys(&:to_s)
       # One-time battle-start passives, e.g. { "adjacent_ally_shield" => 3 }.
@@ -72,6 +76,44 @@ module Combat
 
     def alive?
       @current_health > 0
+    end
+
+    # Jailed: cannot perform basic attacks (abilities/movement still allowed).
+    def disarmed?
+      @disarmed_ticks.positive?
+    end
+
+    # Total absorb-shield HP across all sources (the grey bar).
+    def barrier
+      @barriers.values.sum
+    end
+
+    # Grant an absorb barrier from `source`. Barriers from DIFFERENT sources stack
+    # (each is its own pool), but re-applying the SAME source refreshes rather than
+    # stacks — it tops that source's pool back up to `amount`, so an ability that
+    # recasts whenever mana refills stays bounded.
+    def add_barrier(source, amount)
+      @barriers[source] = [@barriers[source] || 0, amount.to_i].max
+    end
+
+    # Apply `amount` incoming damage: absorb barriers soak it first (in the order
+    # they were granted), then any remainder reduces health (floored at 0). True
+    # damage passes bypass_barrier: true to punch straight through the shield.
+    # Returns the amount that actually reached health (drives lifesteal/drain).
+    def take_damage(amount, bypass_barrier: false)
+      remaining = amount.to_i
+      unless bypass_barrier
+        @barriers.each_key do |src|
+          break if remaining <= 0
+          absorbed = [@barriers[src], remaining].min
+          @barriers[src] -= absorbed
+          remaining -= absorbed
+        end
+        @barriers.reject! { |_, v| v <= 0 }
+      end
+      @current_health -= remaining
+      @current_health = 0 if @current_health.negative?
+      remaining
     end
 
     def immune?(kind)
@@ -103,6 +145,7 @@ module Combat
         stats[k] = v
       end
       stats[:attack_speed] ||= 1.0
+      stats[:resist] ||= 0 # magic mitigation is optional; absent means none
       stats
     end
   end

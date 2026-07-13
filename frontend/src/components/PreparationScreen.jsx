@@ -78,15 +78,20 @@ export default function PreparationScreen({ run, me, onUpdate, onAbandon, replay
     setPlacements((prev) => { const n = { ...prev }; delete n[pcId]; return n })
   }
 
-  // Drag a tableau card onto a champion (bench or grid) to equip it.
+  // Drag a tableau card onto a champion (bench or grid): XP cards are consumed
+  // to grant experience; everything else is equipped.
   async function onChampionCardDrop(e, pcId) {
     if (!isCardDrag(e)) return
     e.preventDefault()
     const cardId = Number(e.dataTransfer.getData(CARD_DND))
     if (!cardId) return
     setError(null)
+    const card = player.tableau.find((c) => c.id === cardId)
     try {
-      onUpdate(await api.assignCard(run.id, cardId, pcId))
+      const updated = card?.category === 'xp'
+        ? await api.feedCard(run.id, cardId, pcId)
+        : await api.assignCard(run.id, cardId, pcId)
+      onUpdate(updated)
     } catch (err) {
       setError((err.errors || [err.message]).join(' · '))
     }
