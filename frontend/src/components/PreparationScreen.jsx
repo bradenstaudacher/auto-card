@@ -23,18 +23,34 @@ export default function PreparationScreen({ run, me, onUpdate, onAbandon, replay
     return m
   }, [run.players])
 
-  // Champions already locked onto the board: the other seat always, plus mine
-  // once I've locked in (so I see the final formation while waiting).
+  // Seats whose player has locked in this round. Placement_data may be pre-filled
+  // from last round's formation (carry-forward), so a seat only counts as "locked"
+  // once its player is actually ready.
+  const readySeats = useMemo(
+    () => new Set(run.players.filter((p) => p.ready).map((p) => p.seat)),
+    [run.players]
+  )
+
+  // Champions locked onto the board: a ready ally's formation, plus mine once
+  // I've locked in (so I see the final formation while waiting).
   const lockedAllies = useMemo(() => {
     const out = []
     Object.entries(round.placement_data || {}).forEach(([seat, list]) => {
-      if (Number(seat) === player.seat && !iAmReady) return
+      const seatNum = Number(seat)
+      if (seatNum === player.seat) { if (!iAmReady) return }
+      else if (!readySeats.has(seatNum)) return // ally hasn't locked in yet
       list.forEach((pl) => out.push({ pcId: pl.player_character_id, x: pl.x, y: pl.y }))
     })
     return out
-  }, [round.placement_data, player.seat, iAmReady])
+  }, [round.placement_data, player.seat, iAmReady, readySeats])
 
-  const [placements, setPlacements] = useState({}) // pcId -> {x,y}
+  // Start the board with my carried-forward formation (from placement_data),
+  // editable — so I tweak rather than redeploy from scratch. Runs once per mount;
+  // PreparationScreen remounts each round, so it re-seeds from the new round.
+  const [placements, setPlacements] = useState(() => {
+    const mine = (round.placement_data || {})[String(player.seat)] || []
+    return mine.reduce((acc, pl) => { acc[pl.player_character_id] = { x: pl.x, y: pl.y }; return acc }, {})
+  }) // pcId -> {x,y}
   const [modalPcId, setModalPcId] = useState(null)
   const [error, setError] = useState(null)
   const [submitting, setSubmitting] = useState(false)

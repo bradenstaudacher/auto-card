@@ -5,17 +5,18 @@
 class EncounterBuilder
   SCALED_STATS = %w[health attack_damage magic_power].freeze
 
-  def self.build(round_config)
-    new(round_config).build
+  def self.build(round_config, seed: nil)
+    new(round_config, seed).build
   end
 
-  def initialize(round_config)
+  def initialize(round_config, seed = nil)
     @config = round_config
     @scale = (round_config["stat_scale"] || 1.0).to_f
+    @seed = seed
   end
 
   def build
-    keys = @config.fetch("monsters")
+    keys = monster_keys
     units = keys.each_with_index.map do |key, i|
       template = GameContent.monster(key)
       pos = placement(i, keys.size)
@@ -35,6 +36,29 @@ class EncounterBuilder
   end
 
   private
+
+  # The round's monsters: either an explicit `monsters:` list, or a deterministic
+  # draw from tier pools when the round specifies `draw: { base: 2, medium: 1 }`.
+  def monster_keys
+    return Array(@config["monsters"]) unless @config["draw"]
+
+    draw_from_pools(@config["draw"])
+  end
+
+  # Sample monster keys from each tier pool using the seeded PRNG, so the same
+  # game seed + round always yields the same enemies (with replacement, so a
+  # round can roll duplicates). Tiers and pools are sorted for a stable stream.
+  def draw_from_pools(draw)
+    prng = Combat::Prng.new(@seed || "encounter")
+    draw.keys.sort.flat_map do |tier|
+      count = draw[tier].to_i
+      next [] unless count.positive?
+
+      pool = GameContent.monsters.select { |m| m["tier"] == tier }.map { |m| m["key"] }.sort
+      raise KeyError, "no monsters in tier #{tier.inspect}" if pool.empty?
+      Array.new(count) { pool[prng.rand_int(pool.size)] }
+    end
+  end
 
   # Fill the top enemy rows left-to-right, wrapping to the next row. Columns are
   # centered so small groups sit toward the middle. Deterministic in order.

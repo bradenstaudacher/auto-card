@@ -42,21 +42,35 @@ export default function RewardScreen({ run, me, onUpdate, onWatchAgain }) {
 
         {offer && offer.status !== 'selected' && (
           <div className="reward-choices">
-            {offer.choices.map((c) => (
-              <button
-                key={c.card_template_id}
-                className={`reward-card card ${RARITY_CLASS[c.rarity] || ''}`}
-                disabled={picking != null}
-                onClick={() => choose(c.card_template_id)}
-              >
-                <div className="card-stripe" style={{ background: stripeBackground(c.valid_types) }} />
-                <div className="card-body">
-                  <div className="card-name">{c.name}</div>
-                  <div className="card-meta">{c.category} · {c.rarity}</div>
-                  <div className="card-desc">{c.description}</div>
-                </div>
-              </button>
-            ))}
+            {offer.choices.map((c) => {
+              const owned = c.owned_count || 0
+              // If you pick this, you'd have owned+1 copies; at the threshold that
+              // triggers an auto-combine into the next tier.
+              const willCombine = c.upgrades && owned + 1 >= (c.combine_threshold || 3)
+              return (
+                <button
+                  key={c.card_template_id}
+                  className={`reward-card card ${RARITY_CLASS[c.rarity] || ''}${owned > 0 ? ' owned' : ''}`}
+                  disabled={picking != null}
+                  onClick={() => choose(c.card_template_id)}
+                >
+                  {owned > 0 && <div className="owned-badge" title={`You already own ${owned}`}>✓ Owned ×{owned}</div>}
+                  <div className="card-stripe" style={{ background: stripeBackground(c.valid_types) }} />
+                  <div className="card-body">
+                    <div className="card-name">{c.name}</div>
+                    <div className="card-meta">{c.category} · {c.rarity}</div>
+                    <div className="card-desc">{c.description}</div>
+                    {owned > 0 && c.upgrades && (
+                      <div className={`reward-combine${willCombine ? ' ready' : ''}`}>
+                        {willCombine
+                          ? `★ Pick to fuse → ${c.combine_threshold}/${c.combine_threshold} upgrades!`
+                          : `${owned + 1}/${c.combine_threshold} toward upgrade`}
+                      </div>
+                    )}
+                  </div>
+                </button>
+              )
+            })}
           </div>
         )}
 

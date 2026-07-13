@@ -174,14 +174,37 @@ class RunSerializer
   def reward_offers_json
     round = @session.current_battle_round
     return [] unless round
-    round.reward_offers.map do |o|
+
+    offers = round.reward_offers.includes(:player).to_a
+    return [] if offers.empty?
+
+    # Which offered templates have an upgrade path (batch-loaded, no N+1).
+    ids = offers.flat_map { |o| o.choices.map { |c| c["card_template_id"] } }.uniq
+    upgradeable = CardTemplate.where(id: ids).pluck(:id, :upgrades_to_key)
+                              .to_h.transform_values(&:present?)
+
+    offers.map do |o|
+      owned = o.player.player_cards.group(:card_template_id).count
       {
         id: o.id,
         player_id: o.player_id,
         status: o.status,
-        choices: o.choices,
+        choices: o.choices.map { |c| annotate_reward_choice(c, owned, upgradeable) },
         selected_card_template_id: o.selected_card_template_id
       }
     end
+  end
+
+  # Adds duplicate/fusion context to a reward choice so the UI can flag cards the
+  # player already owns and show combine progress (mirrors the tableau's
+  # copies/threshold display).
+  def annotate_reward_choice(choice, owned_counts, upgradeable)
+    id = choice["card_template_id"]
+    upgrades = upgradeable[id] || false
+    choice.merge(
+      "owned_count" => owned_counts[id] || 0,
+      "upgrades" => upgrades,
+      "combine_threshold" => upgrades ? COMBINE_THRESHOLD : nil
+    )
   end
 end

@@ -108,8 +108,33 @@ class RunOrchestrator
       round_number: @session.current_round,
       status: "pending",
       battle_seed: "#{@session.seed}-r#{@session.current_round}",
-      encounter_data: EncounterBuilder.build(round_config)
+      encounter_data: EncounterBuilder.build(
+        round_config, seed: "#{@session.seed}-r#{@session.current_round}-encounter"
+      ),
+      placement_data: carried_placement_data
     )
+  end
+
+  # Pre-fill the new round's board with the previous round's formation so players
+  # don't redeploy from scratch — they can still adjust before locking in, and
+  # readiness resets each round (advance! clears it). Empty on round 1. Trimmed
+  # to this round's deploy limit in case it shrank.
+  def carried_placement_data
+    prev = @session.battle_rounds
+                   .where("round_number < ?", @session.current_round)
+                   .order(round_number: :desc).first
+    return {} unless prev&.placement_data.present?
+
+    limit = deploy_limit
+    prev.placement_data.transform_values { |list| Array(list).first(limit) }
+  end
+
+  # Champions a player may deploy this round: fixed 2 in co-op, else the round's
+  # player_slots.
+  def deploy_limit
+    return GameContent.rounds_config.dig("coop", "deployed_per_player") || 2 if @session.coop?
+
+    round_config["player_slots"] || 1
   end
 
   # Encounter config for the current round. Co-op faces a bigger, tougher board
@@ -118,12 +143,18 @@ class RunOrchestrator
     cfg = GameContent.single_player_round(@session.current_round)
     return cfg unless @session.coop?
 
-    monsters = cfg["monsters"]
-    extra = monsters.first((monsters.size / 2.0).ceil) # ~1.5x the enemy count
-    cfg.merge(
-      "monsters" => monsters + extra,
-      "stat_scale" => ((cfg["stat_scale"] || 1.0) * 1.3).round(3)
-    )
+    # Co-op faces ~1.5x the enemies. Bump draw counts (draw format) or duplicate
+    # the front of the explicit list (legacy format), then raise the stat scale.
+    bumped =
+      if cfg["draw"]
+        cfg.merge("draw" => cfg["draw"].transform_values { |n| (n * 1.5).ceil })
+      elsif cfg["monsters"]
+        monsters = cfg["monsters"]
+        cfg.merge("monsters" => monsters + monsters.first((monsters.size / 2.0).ceil))
+      else
+        cfg
+      end
+    bumped.merge("stat_scale" => ((cfg["stat_scale"] || 1.0) * 1.3).round(3))
   end
 
   # --- Preparation -----------------------------------------------------------

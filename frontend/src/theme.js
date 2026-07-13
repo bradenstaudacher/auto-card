@@ -34,6 +34,15 @@ export const MONSTER_GLYPH = {
   'Oathbound Guard': '🛡',
   'Pale Acolyte': '🕯',
   'Rift Brute': '👹',
+  'Husk Crawler': '🐛',
+  'Gnat Swarm': '🦟',
+  'Scrap Golem': '🗿',
+  'Dust Wisp': '🌫',
+  'Grave Stalker': '🧟',
+  'Ember Zealot': '🔥',
+  'Tide Warden': '🔱',
+  'Dread Knight': '⚰',
+  'The Maw': '🌀',
 }
 
 // Status-effect visual cues: a badge glyph + color for the on-token indicator.

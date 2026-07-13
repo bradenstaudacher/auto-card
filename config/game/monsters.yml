@@ -1,13 +1,14 @@
 # Monster templates for PvE encounters. Types span the circle so players must
 # weigh their fielded champions against enemy weaknesses (per locked design).
-# tier: weak | tough | elite | boss — used by the encounter builder to scale.
+# Some mobs are generic (type: null) — neutral on the type circle, low power.
+# tier: the draw pool a round samples from — base | medium | strong | boss.
 monsters:
   - key: lesser_imp
     name: Lesser Imp
     type: Occult
     color: purple
     role: weak melee
-    tier: weak
+    tier: base
     base_stats:
       health: 45
       attack_damage: 7
@@ -25,7 +26,7 @@ monsters:
     type: Fury
     color: crimson
     role: fast melee
-    tier: weak
+    tier: base
     combat_effects:
       burn: { chance: 0.35, damage: 3, duration: 2 }
     base_stats:
@@ -45,7 +46,7 @@ monsters:
     type: Death
     color: black
     role: fragile attacker
-    tier: weak
+    tier: base
     default_abilities: [Vampiric Drain]
     base_stats:
       health: 40
@@ -64,7 +65,7 @@ monsters:
     type: Law
     color: lightblue
     role: armored melee
-    tier: tough
+    tier: medium
     base_stats:
       health: 110
       attack_damage: 8
@@ -82,7 +83,7 @@ monsters:
     type: Holy
     color: lightyellow
     role: simple caster
-    tier: tough
+    tier: medium
     default_abilities: [Vampiric Drain]
     base_stats:
       health: 60
@@ -101,7 +102,7 @@ monsters:
     type: Occult
     color: purple
     role: elite
-    tier: elite
+    tier: strong
     default_abilities: [Cleave]
     ability_params:
       Cleave: { damage_scale: 1.8 }
@@ -113,6 +114,174 @@ monsters:
       resist: 6
       mana_cap: 6
       mana_regen: 1
+      movement_speed: 2
+      attack_range: 1
+      attack_speed: 0.9
+
+  # --- Generic (type: null) low-power mobs — neutral on the type circle. ---
+  - key: husk_crawler
+    name: Husk Crawler
+    type:
+    color: slate
+    role: weak melee
+    tier: base
+    base_stats:
+      health: 35
+      attack_damage: 6
+      magic_power: 0
+      armor: 1
+      resist: 1
+      mana_cap: 0
+      mana_regen: 0
+      movement_speed: 3
+      attack_range: 1
+      attack_speed: 1.0
+  - key: gnat_swarm
+    name: Gnat Swarm
+    type:
+    color: slate
+    role: fast fragile
+    tier: base
+    base_stats:
+      health: 22
+      attack_damage: 4
+      magic_power: 0
+      armor: 0
+      resist: 0
+      mana_cap: 0
+      mana_regen: 0
+      movement_speed: 5
+      attack_range: 1
+      attack_speed: 1.4
+  - key: scrap_golem
+    name: Scrap Golem
+    type:
+    color: slate
+    role: slow tank
+    tier: base
+    base_stats:
+      health: 70
+      attack_damage: 5
+      magic_power: 0
+      armor: 4
+      resist: 2
+      mana_cap: 0
+      mana_regen: 0
+      movement_speed: 2
+      attack_range: 1
+      attack_speed: 0.7
+  - key: dust_wisp
+    name: Dust Wisp
+    type:
+    color: slate
+    role: weak ranged
+    tier: base
+    base_stats:
+      health: 28
+      attack_damage: 5
+      magic_power: 0
+      armor: 0
+      resist: 1
+      mana_cap: 0
+      mana_regen: 0
+      movement_speed: 3
+      attack_range: 3
+      attack_speed: 0.9
+
+  # --- More typed mobs to enrich the draw pools. ---
+  - key: grave_stalker
+    name: Grave Stalker
+    type: Death
+    color: black
+    role: fast melee
+    tier: base
+    base_stats:
+      health: 48
+      attack_damage: 10
+      magic_power: 0
+      armor: 1
+      resist: 1
+      mana_cap: 4
+      mana_regen: 0.5
+      movement_speed: 4
+      attack_range: 1
+      attack_speed: 1.1
+  - key: ember_zealot
+    name: Ember Zealot
+    type: Fury
+    color: crimson
+    role: bruiser
+    tier: medium
+    combat_effects:
+      burn: { chance: 0.4, damage: 4, duration: 2 }
+    base_stats:
+      health: 95
+      attack_damage: 12
+      magic_power: 0
+      armor: 4
+      resist: 3
+      mana_cap: 5
+      mana_regen: 0.5
+      movement_speed: 3
+      attack_range: 1
+      attack_speed: 1.0
+  - key: tide_warden
+    name: Tide Warden
+    type: Law
+    color: lightblue
+    role: ranged caster
+    tier: medium
+    default_abilities: [Hex Bolt]
+    base_stats:
+      health: 80
+      attack_damage: 6
+      magic_power: 13
+      armor: 3
+      resist: 6
+      mana_cap: 8
+      mana_regen: 1.25
+      movement_speed: 2
+      attack_range: 3
+      attack_speed: 0.8
+  - key: dread_knight
+    name: Dread Knight
+    type: Death
+    color: black
+    role: elite bruiser
+    tier: strong
+    default_abilities: [Cleave]
+    ability_params:
+      Cleave: { damage_scale: 1.6 }
+    base_stats:
+      health: 200
+      attack_damage: 18
+      magic_power: 4
+      armor: 8
+      resist: 6
+      mana_cap: 6
+      mana_regen: 1
+      movement_speed: 2
+      attack_range: 1
+      attack_speed: 0.85
+
+  # --- Boss (fixed encounters). ---
+  - key: the_maw
+    name: The Maw
+    type: Occult
+    color: purple
+    role: boss
+    tier: boss
+    default_abilities: [Cleave, Vampiric Drain]
+    ability_params:
+      Cleave: { damage_scale: 2.0 }
+    base_stats:
+      health: 420
+      attack_damage: 22
+      magic_power: 12
+      armor: 10
+      resist: 10
+      mana_cap: 8
+      mana_regen: 1.5
       movement_speed: 2
       attack_range: 1
       attack_speed: 0.9

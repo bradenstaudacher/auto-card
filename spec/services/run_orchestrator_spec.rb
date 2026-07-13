@@ -26,7 +26,19 @@ RSpec.describe RunOrchestrator do
       expect(result).to be_ok
       expect(session.reload.status).to eq("preparation")
       expect(session.players.first.player_characters.count).to eq(3)
-      expect(session.current_battle_round.encounter_data["monsters"]).to eq(%w[lesser_imp lesser_imp])
+      # Round 1 draws 2 base-tier mobs deterministically from the session seed.
+      drawn = session.current_battle_round.encounter_data["monsters"]
+      base_keys = GameContent.monsters.select { |m| m["tier"] == "base" }.map { |m| m["key"] }
+      expect(drawn.size).to eq(2)
+      expect(drawn).to all(be_in(base_keys))
+    end
+
+    it "draws the same encounter for the same seed and round (deterministic)" do
+      cfg = GameContent.single_player_round(4)
+      a = EncounterBuilder.build(cfg, seed: "abc-r4-encounter")["monsters"]
+      b = EncounterBuilder.build(cfg, seed: "abc-r4-encounter")["monsters"]
+      expect(a).to eq(b)
+      expect(a.size).to eq(3) # base:2 + medium:1
     end
 
     it "rejects a selection that isn't exactly three champions" do
@@ -62,6 +74,25 @@ RSpec.describe RunOrchestrator do
       expect(player.player_cards.count).to eq(1)
       expect(session.reload.current_round).to eq(2)
       expect(session.status).to eq("preparation")
+    end
+
+    it "carries the previous round's formation into the next round (still adjustable)" do
+      session = start_prepared_run(user)
+      player = session.players.first
+      orch = described_class.new(session)
+
+      place(orch, player, "ember_vanguard", 2, 5)
+      round1 = session.reload.current_battle_round
+      offer = round1.reward_offers.find_by(player: player)
+      orch.select_reward(reward_offer: offer, card_template_id: offer.choices.first["card_template_id"])
+
+      session.reload
+      expect(session.current_round).to eq(2)
+      carried = session.current_battle_round.placement_data[player.seat.to_s]
+      expect(carried).to be_present
+      expect(carried.first).to include("x" => 2, "y" => 5)
+      # Pre-filled but NOT locked — the player still confirms with Lock In.
+      expect(player.reload.ready).to be(false)
     end
 
     it "re-simulates a resolved round to a byte-identical timeline (determinism through the stack)" do

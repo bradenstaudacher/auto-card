@@ -1,66 +1,68 @@
 # Single-player 10-round curve (locked this session). player_slots = champions
-# the player may deploy that round. `monsters` lists monster keys (from
-# monsters.yml); EncounterBuilder auto-places them in the right-side zone.
-# stat_scale multiplies monster base stats (health/attack) for late-game ramp.
-# reward choices: 3 on win / 2 on loss (0 on the boss round).
+# the player may deploy that round. Enemies come from EITHER an explicit
+# `monsters:` list of keys (from monsters.yml) OR a `draw:` composition that
+# samples that many monsters from each tier pool (base|medium|strong|boss),
+# deterministically from the game seed. EncounterBuilder auto-places them in the
+# right-side zone. stat_scale multiplies monster base stats (health/attack) for
+# late-game ramp. reward choices: 3 on win / 2 on loss (0 on the boss round).
 single_player:
   - round: 1
     player_slots: 1
-    monsters: [lesser_imp, lesser_imp]
+    draw: { base: 2 }
     stat_scale: 1.0
     reward_choices_on_win: 3
     reward_choices_on_loss: 2
   - round: 2
     player_slots: 1
-    monsters: [oathbound_guard]
+    draw: { medium: 1 }
     stat_scale: 1.0
     reward_choices_on_win: 3
     reward_choices_on_loss: 2
   - round: 3
     player_slots: 2
-    monsters: [lesser_imp, ash_hound, bone_wretch]
+    draw: { base: 3 }
     stat_scale: 1.0
     reward_choices_on_win: 3
     reward_choices_on_loss: 2
   - round: 4
     player_slots: 2
-    monsters: [ash_hound, bone_wretch, pale_acolyte]
+    draw: { base: 2, medium: 1 }
     stat_scale: 1.05
     reward_choices_on_win: 3
     reward_choices_on_loss: 2
   - round: 5
     player_slots: 2
-    monsters: [rift_brute, ash_hound, ash_hound]
+    draw: { base: 2, strong: 1 }
     stat_scale: 1.05
     reward_choices_on_win: 3
     reward_choices_on_loss: 2
   - round: 6
     player_slots: 3
-    monsters: [lesser_imp, lesser_imp, ash_hound, ash_hound, bone_wretch]
+    draw: { base: 4, medium: 1 }
     stat_scale: 1.15
     reward_choices_on_win: 3
     reward_choices_on_loss: 2
   - round: 7
     player_slots: 3
-    monsters: [oathbound_guard, pale_acolyte, bone_wretch]
+    draw: { base: 1, medium: 2 }
     stat_scale: 1.1
     reward_choices_on_win: 3
     reward_choices_on_loss: 2
   - round: 8
     player_slots: 3
-    monsters: [pale_acolyte, pale_acolyte, oathbound_guard, bone_wretch]
+    draw: { base: 1, medium: 2, strong: 1 }
     stat_scale: 1.2
     reward_choices_on_win: 3
     reward_choices_on_loss: 2
   - round: 9
     player_slots: 3
-    monsters: [rift_brute, oathbound_guard, ash_hound, bone_wretch]
+    draw: { base: 2, medium: 1, strong: 1 }
     stat_scale: 1.2
     reward_choices_on_win: 3
     reward_choices_on_loss: 2
   - round: 10
     player_slots: 3
-    monsters: [rift_brute, rift_brute, oathbound_guard, pale_acolyte]
+    monsters: [the_maw, dread_knight, pale_acolyte]
     stat_scale: 1.5
     boss: true
     reward_choices_on_win: 0
