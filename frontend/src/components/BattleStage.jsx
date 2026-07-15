@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { typeColor, typeText, TYPE_GLYPH, MONSTER_GLYPH, STATUS_META } from '../theme'
 import { buildInitialUnits, deriveState, logLine } from '../battleState'
+import { ATTACK_VFX_CONFIG } from '../attackVfxConfig'
 
 const COLS = 8
 const ROWS = 6
@@ -19,6 +20,7 @@ export default function BattleStage({ run, round, onComplete }) {
   const [speed, setSpeed] = useState(1)
   const [logOpen, setLogOpen] = useState(true)
   const logRef = useRef(null)
+  const [vfxInstances, setVfxInstances] = useState([])
 
   const finished = tick >= maxTick
 
@@ -39,6 +41,31 @@ export default function BattleStage({ run, round, onComplete }) {
   )
 
   useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight }, [log.length])
+
+  // Keep a ref to current units so the tick effect can read positions without
+  // needing units as a dependency (it only fires once per tick).
+  const unitsRef = useRef(units)
+  unitsRef.current = units
+
+  useEffect(() => {
+    const attacks = events.filter((e) => e.type === 'attack' && e.tick === tick)
+    if (attacks.length === 0) return
+
+    const newVfx = attacks.flatMap((e) => {
+      const attacker = unitsRef.current[e.source_id]
+      const target = unitsRef.current[e.target_id]
+      if (!attacker || !target) return []
+      const classType = (initial[e.source_id]?.type || '').toLowerCase()
+      if (!ATTACK_VFX_CONFIG[classType]) return []
+      return [{ id: `${e.tick}-${e.source_id}`, classType, ax: attacker.x, ay: attacker.y, tx: target.x, ty: target.y }]
+    })
+
+    if (newVfx.length === 0) return
+    setVfxInstances((prev) => [...prev, ...newVfx])
+    const ids = new Set(newVfx.map((v) => v.id))
+    const timer = setTimeout(() => setVfxInstances((prev) => prev.filter((v) => !ids.has(v.id))), 420)
+    return () => clearTimeout(timer)
+  }, [tick]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const winner = round.result?.winner
   const cells = []
@@ -63,6 +90,29 @@ export default function BattleStage({ run, round, onComplete }) {
         </div>
         <div className="battle-grid replay-grid" style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}>
           {cells}
+          <div className="board-vfx-layer">
+            {vfxInstances.map((v) => {
+              const config = ATTACK_VFX_CONFIG[v.classType]
+              if (!config) return null
+              const angle = Math.atan2(v.ty - v.ay, v.tx - v.ax)
+              return (
+                <div
+                  key={v.id}
+                  className="attack-vfx-wrapper"
+                  style={{
+                    left: `${((v.ax + 0.5) / COLS) * 100}%`,
+                    top: `${((v.ay + 0.5) / ROWS) * 100}%`,
+                    transform: `rotate(${angle}rad)`,
+                  }}
+                >
+                  <div
+                    className="attack-vfx-sprite"
+                    style={{ backgroundImage: `url(${config.spritesheet})` }}
+                  />
+                </div>
+              )
+            })}
+          </div>
           {Object.values(units).map((u) => {
             const isMonster = u.team === 'monsters'
             const glyph = (isMonster && MONSTER_GLYPH[u.name]) || TYPE_GLYPH[u.type] || '?'

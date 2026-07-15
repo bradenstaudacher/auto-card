@@ -1,0 +1,89 @@
+{
+  "name": "Autobattler Attack VFX Pack v2",
+  "version": "2.0.0",
+  "frameSize": {
+    "width": 64,
+    "height": 64
+  },
+  "frameCount": 4,
+  "orientation": "east / left-to-right by default; rotate wrapper toward target",
+  "durationMs": 360,
+  "rendering": "Transparent PNG overlay. Center on attacker and render above the existing unit circle.",
+  "classes": {
+    "occult": {
+      "displayName": "Occult",
+      "classColor": "#6A1B9A",
+      "primaryVfxColor": "#8C2EFF",
+      "secondaryVfxColor": "#DA70FF",
+      "description": "Purple void sigil, runes, and a jagged eldritch bolt.",
+      "frames": [
+        "occult/occult_attack_overlay_0.png",
+        "occult/occult_attack_overlay_1.png",
+        "occult/occult_attack_overlay_2.png",
+        "occult/occult_attack_overlay_3.png"
+      ],
+      "spritesheet": "occult/occult_attack_overlay_spritesheet_4x1.png",
+      "previewGif": "occult/occult_attack_preview.gif"
+    },
+    "holy": {
+      "displayName": "Holy",
+      "classColor": "#F6D65B",
+      "primaryVfxColor": "#FFE680",
+      "secondaryVfxColor": "#FFF7C2",
+      "description": "Light yellow radiant spear with halo rings and starburst.",
+      "frames": [
+        "holy/holy_attack_overlay_0.png",
+        "holy/holy_attack_overlay_1.png",
+        "holy/holy_attack_overlay_2.png",
+        "holy/holy_attack_overlay_3.png"
+      ],
+      "spritesheet": "holy/holy_attack_overlay_spritesheet_4x1.png",
+      "previewGif": "holy/holy_attack_preview.gif"
+    },
+    "law": {
+      "displayName": "Law",
+      "classColor": "#58B7E8",
+      "primaryVfxColor": "#6EC6FF",
+      "secondaryVfxColor": "#D3F1FF",
+      "description": "Light blue geometric verdict beam with hex glyphs.",
+      "frames": [
+        "law/law_attack_overlay_0.png",
+        "law/law_attack_overlay_1.png",
+        "law/law_attack_overlay_2.png",
+        "law/law_attack_overlay_3.png"
+      ],
+      "spritesheet": "law/law_attack_overlay_spritesheet_4x1.png",
+      "previewGif": "law/law_attack_preview.gif"
+    },
+    "fury": {
+      "displayName": "Fury",
+      "classColor": "#B80F2D",
+      "primaryVfxColor": "#DC143C",
+      "secondaryVfxColor": "#FF6B4A",
+      "description": "Crimson three-claw swipe with ember sparks.",
+      "frames": [
+        "fury/fury_attack_overlay_0.png",
+        "fury/fury_attack_overlay_1.png",
+        "fury/fury_attack_overlay_2.png",
+        "fury/fury_attack_overlay_3.png"
+      ],
+      "spritesheet": "fury/fury_attack_overlay_spritesheet_4x1.png",
+      "previewGif": "fury/fury_attack_preview.gif"
+    },
+    "death": {
+      "displayName": "Death",
+      "classColor": "#111111",
+      "primaryVfxColor": "#161616",
+      "secondaryVfxColor": "#A7A1B3",
+      "description": "Black smoke scythe arc with gray soul-wisp highlights.",
+      "frames": [
+        "death/death_attack_overlay_0.png",
+        "death/death_attack_overlay_1.png",
+        "death/death_attack_overlay_2.png",
+        "death/death_attack_overlay_3.png"
+      ],
+      "spritesheet": "death/death_attack_overlay_spritesheet_4x1.png",
+      "previewGif": "death/death_attack_preview.gif"
+    }
+  }
+}

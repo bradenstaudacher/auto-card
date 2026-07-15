@@ -1,0 +1,41 @@
+/* Autobattler Attack VFX Pack v2
+   Production spritesheets are transparent 64x64 frames, 4 frames wide.
+   Use an outer wrapper for position/rotation and an inner element for frame animation.
+*/
+
+.board-vfx-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 50;
+}
+
+.attack-vfx-wrapper {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  transform-origin: center center;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.attack-vfx-sprite {
+  width: 64px;
+  height: 64px;
+  background-size: 256px 64px;
+  background-repeat: no-repeat;
+  animation: attack-vfx-frames 360ms steps(4) forwards;
+  image-rendering: auto;
+}
+
+.attack-vfx--occult { background-image: url('./occult/occult_attack_overlay_spritesheet_4x1.png'); }
+.attack-vfx--holy   { background-image: url('./holy/holy_attack_overlay_spritesheet_4x1.png'); }
+.attack-vfx--law    { background-image: url('./law/law_attack_overlay_spritesheet_4x1.png'); }
+.attack-vfx--fury   { background-image: url('./fury/fury_attack_overlay_spritesheet_4x1.png'); }
+.attack-vfx--death  { background-image: url('./death/death_attack_overlay_spritesheet_4x1.png'); }
+
+@keyframes attack-vfx-frames {
+  from { background-position: 0 0; }
+  to { background-position: -256px 0; }
+}

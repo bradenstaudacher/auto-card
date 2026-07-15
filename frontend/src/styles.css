@@ -392,6 +392,27 @@ body {
 .floater.burn { color: #ffab4c; }
 .floater.cleanse { color: #6cf0d0; font-size: 12px; }
 
+/* --- Attack VFX overlay --- */
+.battle-grid { position: relative; }
+.board-vfx-layer {
+  position: absolute; inset: 0; pointer-events: none; overflow: visible; z-index: 50;
+}
+.attack-vfx-wrapper {
+  position: absolute; width: 64px; height: 64px;
+  transform-origin: center center; pointer-events: none;
+  margin-left: -32px; margin-top: -32px;
+}
+.attack-vfx-sprite {
+  width: 64px; height: 64px;
+  background-size: 256px 64px; background-repeat: no-repeat;
+  animation: attack-vfx-frames 360ms steps(4) forwards;
+  image-rendering: auto;
+}
+@keyframes attack-vfx-frames {
+  from { background-position: 0 0; }
+  to   { background-position: -256px 0; }
+}
+
 /* --- Co-op UI --- */
 .start-buttons { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
 .code-input { text-align: center; letter-spacing: 8px; font-size: 22px; text-transform: uppercase; }
